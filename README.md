@@ -7,9 +7,19 @@ Sistema web para registrar envíos, asignarlos a repartidores y seguir cada paqu
 **persistencia políglota**: PostgreSQL, MongoDB y Redis detrás de una API REST en Node.js + Express.
 Todos los datos son ficticios.
 
-> **Estado actual: Fase 4 — API base.** Compose levanta PostgreSQL, MongoDB, Redis y la API. Están listos
-> `GET /health`, el formato de errores, los contratos compartidos, las migraciones y la web de inicio.
-> Los módulos de negocio responden `501` hasta que su responsable los desarrolle.
+> **Estado actual: Fase 5 — Dominio 1 (Solicitudes y envíos).** Compose levanta PostgreSQL, MongoDB, Redis y la API.
+> Están listos `GET /health`, el formato de errores, los contratos compartidos, las migraciones, la web de inicio y
+> el Dominio 1: formulario de solicitud, comprobante con código único y gestión de la solicitud (aceptar o cancelar).
+> Los módulos de Camila y Juan Fernando responden `501` hasta que los desarrollen.
+
+## Pantallas disponibles
+
+| Pantalla | Dirección | Responsable |
+| --- | --- | --- |
+| Inicio y estado del sistema | <http://localhost:3000> | Compartida |
+| Solicitar envío | <http://localhost:3000/envios/solicitud.html> | Liliana Averos |
+| Confirmación (comprobante) | `/envios/confirmacion.html?codigo=ENV-…` (se abre al registrar) | Liliana Averos |
+| Gestionar solicitud (aceptar / cancelar) | <http://localhost:3000/envios/consulta.html> | Liliana Averos |
 
 ## Arquitectura
 
@@ -77,7 +87,15 @@ node --test tests/contratos.test.js
 
 # API en ejecución (requiere docker compose up --build -d)
 node --test tests/api.test.js
+
+# Dominio 1: solicitudes y envíos (API en ejecución)
+node --test tests/envios.test.js
+
+# Todo junto
+node --test "tests/*.test.js"
 ```
+
+`tests/envios.test.js` crea algunos envíos ficticios con `[PRUEBA]` en la descripción; no borra datos.
 
 ### Servicios y puertos
 
