@@ -14,8 +14,10 @@ Lectura de zonas y tipos de servicio con datos semilla, necesarios para validar 
 - Las conexiones se importan de `src/db/`; no se abren conexiones propias.
 - Los estados y códigos se toman de `src/shared/`; no se duplican.
 - Los endpoints se documentan en la sección del módulo en `docs/api.md`.
-- **Estado actual:** `catalogos.routes.js` ya está registrado en `routes/index.js` y responde `501`.
-  Para implementar el módulo se reemplaza el contenido de `catalogos.routes.js` por un `Router` propio.
+- **Estado actual (Fase 5):** implementada la lectura `GET /api/catalogos` (`catalogos.routes.js` →
+  `catalogos.repository.js`; al ser solo lectura no necesita controlador ni servicio propios). El módulo `envios`
+  usa `buscarZonaActiva` y `buscarTipoServicioActivo` para validar solicitudes. El CRUD administrativo
+  lo agrega Camila acordándolo antes, porque cambia este módulo.
 - **Contratos disponibles:** `shared/estados.js` (validarTransicion), `shared/validacion.js` (validar),
   `shared/errores.js` (AppError, errores), `shared/identificadores.js`, `shared/outbox.js` (registrarEvento)
   y `db/postgres.js` (pool, conTransaccion).

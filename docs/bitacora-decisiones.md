@@ -62,6 +62,13 @@ Docker Desktop estaba cerrado. Se resolvió abriéndolo.
 | D28 | La API reintenta cada 5 s si PostgreSQL no responde al arrancar; un error de SQL detiene el arranque | Salir siempre: con `node --watch` el contenedor quedaría detenido sin reiniciarse | Aprobada | 2026-11-03 |
 | D29 | `outbox` con `CHECK` del formato `ENV-XXXXXXXX`, índice parcial de pendientes e índice por envío | Sin restricciones: datos inválidos llegarían a MongoDB | Aprobada | 2026-11-03 |
 | D30 | Pruebas con `node --test` sin dependencias: `tests/contratos.test.js` (sin Docker) y `tests/api.test.js` (API en ejecución) | Jest o Mocha: dependencias extra | Aprobada | 2026-11-03 |
+| D31 | Tabla `envios` en `002_envios.sql`: código único con `CHECK`, estado con `CHECK`, claves foráneas a catálogos, `CHECK` de cancelación coherente e índice `(estado, creado_en)` | Validar solo en la API: un error de código dejaría datos inválidos en la fuente oficial | Aprobada | 2026-11-03 |
+| D32 | Idempotencia al crear con el encabezado `Idempotency-Key` (UUID) guardado en `envios.clave_idempotencia` `UNIQUE`; repetir devuelve `200` con el mismo envío (resuelve P5) | Detectar duplicados por datos iguales: dos envíos legítimos idénticos serían rechazados | Aprobada | 2026-11-03 |
+| D33 | Aceptar y cancelar son idempotentes: si el envío ya está en el estado pedido se responde `200` con `cambiado: false` y sin evento nuevo | Responder `409`: un reintento por red lenta parecería un error | Aprobada | 2026-11-03 |
+| D34 | Desde las solicitudes solo se acepta (`CREADO`) y se cancela (`CREADO` o `ACEPTADO`); desde `ASIGNADO` decide despacho (P3 sigue abierta) | Permitir cancelar en cualquier estado: chocaría con la capacidad de Camila y las entregas de Juan Fernando | Aprobada | 2026-11-03 |
+| D35 | El servidor valida zonas, tipo de servicio y peso máximo contra el catálogo de PostgreSQL e ignora campos que el cliente no decide (`estado`, `codigo`, `precio`) | Confiar en el formulario: cualquiera puede enviar otra petición con `curl` | Aprobada | 2026-11-03 |
+| D36 | Pantalla "Gestionar solicitud" (`consulta.html`) dentro del Dominio 1 para buscar por código, aceptar y cancelar | Esperar al panel de Camila: no se podría demostrar el flujo CREADO → ACEPTADO → CANCELADO del Dominio 1 | Aprobada | 2026-11-03 |
+| D37 | Entrega estimada calculada al consultar (`creado_en` + horas del tipo de servicio), sin guardarla | Guardarla en una columna: se desincronizaría si cambia el catálogo; queda abierto si se prefiere congelarla | Aprobada | 2026-11-03 |
 
 ## Propuestas pendientes de acuerdo
 
@@ -71,7 +78,7 @@ Docker Desktop estaba cerrado. Se resolvió abriéndolo.
 | P2 | ¿La consulta operativa necesita vista derivada o bastan índices PostgreSQL? | Camila |
 | P3 | ¿Quién puede cancelar un envío ASIGNADO? | Equipo |
 | P4 | Plazo de 10 min para reconciliar evidencias huérfanas | Juan Fernando |
-| P5 | Idempotencia al crear envíos (clave de idempotencia) | Liliana, Fase 5 |
+| P5 | Idempotencia al crear envíos (clave de idempotencia) | Resuelta con D32 (aprobada) |
 | P6 | Persistencia de Redis (instantáneas por defecto, AOF o ninguna) según cómo se quiera demostrar la prueba 4 | Juan Fernando |
 
 ## Fase 2 — Estructura inicial (2026-11-03)
@@ -203,4 +210,42 @@ Resultado en el equipo de Liliana:
 Ajuste visual posterior: a pedido de Liliana se rediseñó la página de inicio (portada con los integrantes del Grupo 1,
 diagrama de arquitectura, tarjetas por responsable y panel de estado). Revisado en navegador sin interfaz a 1440 px
 y 390 px de ancho, con todos los gestores en línea y con Redis caído.
+
+## Fase 5 — Dominio 1: solicitudes y envíos (2026-11-03)
+
+Archivos nuevos: migración `002_envios.sql`; módulo `catalogos` (`catalogos.repository.js`, `catalogos.routes.js`);
+módulo `envios` (`envios.validation.js`, `envios.repository.js`, `envios.service.js`, `envios.controller.js`,
+`envios.routes.js`); pantallas `frontend/envios/` (`solicitud`, `confirmacion`, `consulta` y `envios.js`);
+`tests/envios.test.js`. Modificados: `index.html` (tarjeta "Solicitar envío" enlazada y navegación),
+`css/estilos.css` (estilos de formularios y comprobante, agregados al final), `docs/api.md` (sección Liliana),
+`README.md`, README de los módulos `envios` y `catalogos`, `frontend/README.md`.
+
+Pruebas hechas por Claude fuera de Docker (PostgreSQL 16 y Redis 7.0 locales, sin MongoDB):
+
+| Prueba | Resultado |
+| --- | --- |
+| Migración 002 con 001 y 090 ya aplicadas (situación del equipo de Liliana) | Se aplica `002_envios.sql`: `1 nuevas, 3 en total` |
+| `node --test tests/envios.test.js` | 19 de 19 correctas |
+| `node --test tests/contratos.test.js` | 10 de 10 correctas |
+| `node --test tests/api.test.js` | 5 de 6; falla solo `/health` 200 porque no había MongoDB (igual que en la Fase 4) |
+| 8 `POST` simultáneos con la misma `Idempotency-Key` | 1 respuesta `201` y 7 `200`; un solo envío y un solo evento `CREADO` |
+| 8 `PATCH aceptar` simultáneos | Solo uno con `cambiado: true`; eventos del envío: `CREADO, ACEPTADO` |
+| Envíos sin evento `CREADO` en la outbox | 0 |
+| Pantallas en navegador sin interfaz a 1440 px y 390 px | Errores por campo, registro, comprobante, aceptar, cancelar con motivo y código inexistente; sin desbordes horizontales. Único error de consola: el `404` esperado al buscar un código inexistente |
+
+Resultado en el equipo de Liliana:
+
+| Comprobación | Resultado obtenido |
+| --- | --- |
+| `node --test tests/` | No válido en Node 24 en Windows (toma `tests` como módulo). Se cambió la documentación a `node --test "tests/*.test.js"` |
+| `docker compose logs api` justo tras `restart` | Mostraba solo el cierre; además se registraban los `501` esperados con su traza. Se ajustó `errorHandler` para no registrar `501` y se añadió `Start-Sleep -Seconds 5` |
+| Arranque tras el ajuste | `0 nuevas, 3 en total` (la `002_envios.sql` se aplicó en el reinicio anterior); 3 gestores conectados |
+| `node --test "tests/*.test.js"` | 35 de 35 correctas (10 contratos, 6 API, 19 envíos) |
+| Pantallas (paso 3) | Errores por campo; registro `ENV-G2KPR9W7` (Express, 9.96 kg); comprobante; aceptar; cancelar con motivo; botones desactivados según estado (capturas de Liliana) |
+| `envios` y `outbox` del envío (paso 4) | `CANCELADO`, motivo guardado; eventos 16 `CREADO`/CLIENTE, 17 `ACEPTADO`/OPERADOR, 18 `CANCELADO`/OPERADOR |
+| Conteos | 11 envíos (10 de las pruebas + 1 manual) y 18 eventos (15 de las pruebas + 3 manuales): cuadran exactamente |
+| `docker compose down` + `up -d` sin `-v` (paso 5) | 4 servicios `healthy`; siguen 11 envíos y 18 eventos |
+
+Nota: en la prueba manual se usaron nombres y teléfonos reales; para la demo se usarán solo datos ficticios.
+**Fase 5 verificada en el equipo de Liliana.**
 

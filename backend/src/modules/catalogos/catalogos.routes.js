@@ -1,6 +1,18 @@
-// Módulo catalogos — responsable: Liliana.
-// Provisional: responde 501 hasta que se implemente en la Fase 5.
-// Para implementarlo, reemplaza este contenido por un Router propio de Express.
-const { moduloPendiente } = require('../../shared/moduloPendiente');
+// Módulo catalogos — responsable: Liliana Averos.
+// Lectura de zonas y tipos de servicio activos (los usa el formulario de solicitud).
+// El mantenimiento administrativo (crear, editar, desactivar) lo agrega Camila.
+const { Router } = require('express');
+const repositorio = require('./catalogos.repository');
 
-module.exports = moduloPendiente('catalogos', 'Liliana');
+const router = Router();
+
+// GET /api/catalogos → { zonas, tipos_servicio }
+router.get('/', async (req, res) => {
+  const [zonas, tiposServicio] = await Promise.all([
+    repositorio.listarZonasActivas(),
+    repositorio.listarTiposServicioActivos(),
+  ]);
+  res.json({ ok: true, datos: { zonas, tipos_servicio: tiposServicio } });
+});
+
+module.exports = router;
