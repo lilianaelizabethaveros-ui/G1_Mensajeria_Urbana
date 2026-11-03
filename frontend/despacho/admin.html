@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel administrativo · Mensajería Urbana</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/despacho/despacho.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/">
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <span class="barra__etiqueta">Datos 100 % ficticios</span>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas">
+        <a href="/">Inicio</a> /
+        <a href="/despacho/index.html">Despacho</a> /
+        Administración
+      </p>
+      <h1>Panel administrativo</h1>
+      <p>Administración de zonas, repartidores y capacidad operativa.</p>
+    </div>
+  </section>
+
+  <div id="mensaje" class="oculto" role="status" aria-live="polite"></div>
+
+  <main class="contenedor cuerpo-pagina">
+    <section class="panel">
+      <h2 class="panel__titulo">Zonas registradas</h2>
+      <div class="tabla-contenedor">
+        <table class="tabla-repartidores">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="zonas">
+            <tr><td colspan="3">Cargando zonas...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Crear zona</h2>
+      <form id="form-crear-zona" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="zona-codigo">Código</label>
+            <input id="zona-codigo" required maxlength="10"
+                   placeholder="Ej.: OESTE">
+          </div>
+          <div class="campo">
+            <label for="zona-nombre">Nombre</label>
+            <input id="zona-nombre" required maxlength="80"
+                   placeholder="Ej.: Zona Oeste">
+          </div>
+        </div>
+        <button class="boton" type="submit">Crear zona</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Editar o desactivar zona</h2>
+      <form id="form-editar-zona" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="editar-zona-codigo">Zona</label>
+            <select id="editar-zona-codigo" required></select>
+          </div>
+          <div class="campo">
+            <label for="editar-zona-nombre">Nuevo nombre</label>
+            <input id="editar-zona-nombre" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="editar-zona-activa">Estado</label>
+            <select id="editar-zona-activa">
+              <option value="true">Activa</option>
+              <option value="false">Inactiva</option>
+            </select>
+          </div>
+        </div>
+        <button class="boton" type="submit">Guardar zona</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Repartidores registrados</h2>
+      <div class="tabla-contenedor">
+        <table class="tabla-repartidores">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Zona</th>
+              <th>Carga</th>
+              <th>Cupos libres</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="repartidores">
+            <tr><td colspan="6">Cargando repartidores...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Crear repartidor</h2>
+      <form id="form-crear-repartidor" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="rep-codigo">Código</label>
+            <input id="rep-codigo" required maxlength="7"
+                   placeholder="REP-008">
+          </div>
+          <div class="campo">
+            <label for="rep-nombre">Nombre del repartidor/a</label>
+            <input id="rep-nombre" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="rep-zona">Zona</label>
+            <select id="rep-zona" required></select>
+          </div>
+          <div class="campo">
+            <label for="rep-capacidad">Capacidad máxima</label>
+            <input id="rep-capacidad" type="number" min="1"
+                   step="1" required>
+          </div>
+        </div>
+        <button class="boton" type="submit">Crear repartidor</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Editar repartidor y capacidad</h2>
+      <form id="form-editar-repartidor" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="editar-rep-codigo">Repartidor</label>
+            <select id="editar-rep-codigo" required></select>
+          </div>
+          <div class="campo">
+            <label for="editar-rep-nombre">Nombre</label>
+            <input id="editar-rep-nombre" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="editar-rep-zona">Zona</label>
+            <select id="editar-rep-zona" required></select>
+          </div>
+          <div class="campo">
+            <label for="editar-rep-capacidad">Capacidad máxima</label>
+            <input id="editar-rep-capacidad" type="number"
+                   min="1" step="1" required>
+          </div>
+          <div class="campo">
+            <label for="editar-rep-activo">Estado</label>
+            <select id="editar-rep-activo">
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        <button class="boton" type="submit">Guardar repartidor</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Grupo 1 · ESPE</span>
+      <span>Dominio 2 · Administración · Camila Perrazo</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/despacho/admin.js"></script>
+</body>
+</html>
