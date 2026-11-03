@@ -50,10 +50,10 @@ notepad .env        # cambia las tres "cambia_esta_clave_local" por claves inven
 docker compose up --build -d
 Start-Sleep -Seconds 20
 docker compose ps   # los 4 servicios deben decir (healthy)
-node --test "tests/*.test.js"
+node --test --test-concurrency=1 "tests/*.test.js"
 ```
 
-Debe terminar con `pass 35` y `fail 0`. Abre <http://localhost:3000>: el panel de estado debe mostrar
+Debe terminar con `fail 0` (el número de pruebas crece a medida que cada integrante agrega las suyas). Abre <http://localhost:3000>: el panel de estado debe mostrar
 PostgreSQL, MongoDB y Redis **En línea**.
 
 Si algo falla:
@@ -62,7 +62,8 @@ Si algo falla:
 | --- | --- | --- |
 | `Falta la variable de entorno …` | No existe `.env` o le falta una línea | Volver a copiar `.env.example` |
 | `port is already allocated` en 5432, 6379 o 27018 | Otro programa usa ese puerto | Cambia `POSTGRES_HOST_PORT`, `REDIS_HOST_PORT` o `MONGO_HOST_PORT` en **tu** `.env` |
-| `node --test tests/` falla con "Cannot find module" | En Node 24 para Windows hay que dar el patrón | Usa `node --test "tests/*.test.js"` |
+| `node --test tests/` falla con "Cannot find module" | En Node 24 para Windows hay que dar el patrón | Usa `node --test --test-concurrency=1 "tests/*.test.js"` |
+| Fallan pruebas que cuentan eventos de la outbox (`52 !== 51`) | Los archivos de prueba corrieron en paralelo y otro módulo escribió eventos al mismo tiempo | Usa siempre `--test-concurrency=1` (un archivo a la vez) |
 | Cambié código y no se nota | En Windows `node --watch` no detecta los cambios | `docker compose restart api` |
 | Cambié `package.json` o el `Dockerfile` | La imagen está desactualizada | `docker compose up --build -d` |
 
@@ -139,7 +140,7 @@ Cuando tu pantalla funcione, en tu PR cambia **solo tu tarjeta** de `frontend/in
 ### Pruebas
 
 Agrega `tests/<tu-modulo>.test.js` con `node:test` (sin dependencias nuevas), siguiendo
-`tests/envios.test.js`. Antes de cada PR: `node --test "tests/*.test.js"` debe pasar completo.
+`tests/envios.test.js`. Antes de cada PR: `node --test --test-concurrency=1 "tests/*.test.js"` debe pasar completo.
 
 ## 5. Flujo de Git para cada uno
 
