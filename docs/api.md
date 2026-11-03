@@ -331,7 +331,82 @@ cuando sus endpoints y filtros estén implementados.
 
 ### Dominio 5 — Consulta operativa
 
-*Pendiente de implementación.*
+
+**Estado:** Implementado y probado.
+
+**Responsable:** Camila Perrazo.
+
+**Gestor:** PostgreSQL.
+
+**Endpoint:** `GET /api/consulta`
+
+**Pantalla:** `/despacho/consulta.html`
+
+### Filtros disponibles
+
+| Parámetro | Descripción |
+| --- | --- |
+| `codigo` | Código completo o parcial del envío. |
+| `zona` | Código de zona de destino. |
+| `estado` | Estado actual del envío. |
+| `destinatario` | Nombre completo o parcial del destinatario. |
+| `fecha_desde` | Fecha inicial del registro, incluida. |
+| `fecha_hasta` | Fecha final del registro, incluida. |
+| `pagina` | Número de página, desde 1. |
+| `limite` | Resultados por página, de 1 a 100. |
+
+Los filtros son opcionales y pueden combinarse.
+
+### Ejemplo de consulta
+
+`GET /api/consulta?zona=CENTRO&estado=ACEPTADO`
+
+La respuesta utiliza el formato común `{ ok, datos }`.
+
+Dentro de `datos` se incluyen:
+- `resultados`: lista de envíos encontrados.
+- `paginacion`: página actual, límite, total y total de páginas.
+
+### Validaciones
+
+- `200`: consulta realizada correctamente, incluso sin coincidencias.
+- `400 VALIDACION`: filtros, fechas o paginación inválidos.
+- `500 ERROR_INTERNO`: error inesperado del servidor.
+
+### Decisión P2 — Índices PostgreSQL
+
+Se eligieron índices sobre la tabla `envios` en lugar de una vista derivada.
+
+Migración: `102_indices_consulta.sql`.
+
+La consulta lee directamente el estado vigente desde PostgreSQL.
+No requiere mantener ni sincronizar una copia adicional de los datos.
+
+### Archivos implementados
+
+- `backend/src/modules/consulta/consulta.repository.js`
+- `backend/src/modules/consulta/consulta.service.js`
+- `backend/src/modules/consulta/consulta.controller.js`
+- `backend/src/modules/consulta/consulta.routes.js`
+- `database/postgres/migrations/102_indices_consulta.sql`
+- `frontend/despacho/consulta.html`
+- `frontend/despacho/consulta.js`
+- `tests/consulta.test.js`
+
+### Pruebas realizadas
+
+**Comando:** `node --test tests/consulta.test.js`
+
+**Resultado:** 18 pruebas aprobadas, 0 fallidas.
+
+Se verificaron búsquedas por código, zona, estado, destinatario,
+fechas, filtros combinados, validaciones y paginación.
+
+**Pruebas generales del proyecto:** 63 aprobadas, 0 fallidas.
+
+La interfaz también se comprobó en Chrome, obteniendo
+12 envíos con la combinación zona CENTRO y estado ACEPTADO.
+
 
 ## Juan Fernando — Seguimiento, evidencias y estado temporal
 

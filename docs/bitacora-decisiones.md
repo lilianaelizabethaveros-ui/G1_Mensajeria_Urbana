@@ -346,3 +346,84 @@ para los filtros de consulta.
 integración final con seguimiento pendiente de coordinación.
 
 
+## Fase 9 — Dominio 5: consulta operativa (2026-11-03)
+
+**Responsable:** Camila Perrazo.
+
+**Rama de trabajo:** `feat/camila-despacho`.
+
+### Implementación realizada
+
+- Módulo de consulta en `backend/src/modules/consulta/`.
+- Endpoint `GET /api/consulta`.
+- Pantalla `frontend/despacho/consulta.html`.
+- Lógica de búsqueda y paginación en `frontend/despacho/consulta.js`.
+- Migración `102_indices_consulta.sql`.
+- Pruebas automatizadas en `tests/consulta.test.js`.
+- Documentación actualizada en `docs/api.md`.
+
+### Funcionalidades verificadas
+
+| Funcionalidad | Resultado |
+| --- | --- |
+| Consultar envíos registrados | Correcto |
+| Buscar por código completo o parcial | Correcto |
+| Filtrar por zona de destino | Correcto |
+| Filtrar por estado | Correcto |
+| Buscar por destinatario | Correcto |
+| Filtrar por rango de fechas | Correcto |
+| Combinar varios filtros | Correcto |
+| Consultar sin coincidencias | Lista vacía |
+| Rechazar filtros inválidos | HTTP 400 |
+| Paginar los resultados | Correcto |
+| Consultar desde la interfaz web | Correcto |
+
+### Decisión P2 — Índices PostgreSQL
+
+**Decisión de implementación de Camila:** utilizar índices sobre PostgreSQL en lugar de una vista derivada.
+
+**Justificación:** la consulta operativa obtiene directamente los datos oficiales de `envios`, evitando duplicar información y mantener mecanismos adicionales de sincronización.
+
+**Migración:** `102_indices_consulta.sql`.
+
+No se requiere demostrar sincronización con una vista derivada porque no se creó una copia de los datos.
+
+La decisión queda documentada para conocimiento del equipo.
+
+### Pruebas realizadas
+
+Comando del Dominio 5:
+
+`node --test tests/consulta.test.js`
+
+Resultado:
+- 18 pruebas aprobadas.
+- 0 pruebas fallidas.
+
+Pruebas generales:
+
+`node --test --test-concurrency=1 tests/api.test.js tests/contratos.test.js tests/envios.test.js tests/despacho.test.js tests/consulta.test.js`
+
+Resultado:
+- 63 pruebas aprobadas.
+- 0 pruebas fallidas.
+
+### Verificación visual
+
+La interfaz se comprobó en Chrome.
+
+Se aplicaron simultáneamente los filtros:
+- Zona de destino: CENTRO.
+- Estado: ACEPTADO.
+
+Resultado observado: 12 envíos que cumplen ambos criterios.
+
+### Integración con el proyecto
+
+Se actualizó `tests/api.test.js` para comprobar que los Dominios 2 y 5 ya están implementados.
+
+No se modificaron los módulos de Liliana ni de Juan Fernando.
+
+**Estado del Dominio 5:** implementado y probado.
+
+
