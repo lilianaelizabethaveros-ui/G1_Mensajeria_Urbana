@@ -97,8 +97,11 @@ node --test tests/api.test.js
 node --test tests/envios.test.js
 
 # Todo junto
-node --test "tests/*.test.js"
+node --test --test-concurrency=1 "tests/*.test.js"
 ```
+
+Ejecuta siempre todas las pruebas con `--test-concurrency=1` (un archivo a la vez): algunas cuentan los eventos
+de la outbox y, si otro archivo escribe eventos al mismo tiempo, la cuenta no cuadra.
 
 `tests/envios.test.js` crea algunos envíos ficticios con `[PRUEBA]` en la descripción; no borra datos.
 

@@ -1,6 +1,9 @@
 // Pruebas del Dominio 1 (solicitudes y envíos) contra la API en ejecución.
 // Requiere los contenedores levantados. Desde la raíz del proyecto:
 //   node --test tests/envios.test.js
+// Con todos los archivos: node --test --test-concurrency=1 "tests/*.test.js"
+// (uno a la vez: varias pruebas cuentan el total de eventos de la outbox y otro
+// módulo que escriba eventos en paralelo alteraría la cuenta).
 // Cada ejecución crea unos pocos envíos FICTICIOS marcados con "[PRUEBA]" en la
 // descripción. No borra nada: quedan como datos de prueba en el volumen local.
 const { test } = require('node:test');

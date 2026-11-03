@@ -99,7 +99,7 @@ git clone https://github.com/lilianaelizabethaveros-ui/G1_Mensajeria_Urbana.git
 cd G1_Mensajeria_Urbana
 Copy-Item .env.example .env; notepad .env
 docker compose up --build -d; Start-Sleep -Seconds 20; docker compose ps
-node --test "tests/*.test.js"          # pass 35
+node --test --test-concurrency=1 "tests/*.test.js"   # debe terminar con fail 0
 git switch -c feat/juan-seguimiento
 git push -u origin feat/juan-seguimiento
 ```
