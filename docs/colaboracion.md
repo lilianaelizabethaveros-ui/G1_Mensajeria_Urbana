@@ -1,14 +1,14 @@
 # Colaboración con Git y GitHub
 
-*El procedimiento completo de creación del repositorio, colaboradores y Pull Requests se
-detalla en la Fase 6. Aquí quedan las reglas acordadas.*
+Repositorio: <https://github.com/lilianaelizabethaveros-ui/G1_Mensajeria_Urbana> (creado en la Fase 6).
+Primeros pasos de cada integrante y flujo de Pull Request: [guia-equipo.md](guia-equipo.md).
 
 ## Ramas
 
 | Rama | Responsable | Se crea desde |
 | --- | --- | --- |
 | `main` | Protegida: solo entra por Pull Request | — |
-| `feat/liliana-envios` | Liliana | `main` inicial |
+| `feat/liliana-envios` | Liliana | `main` inicial (unida a `main` con el PR #1) |
 | `feat/camila-despacho` | Camila | `main` **después** de integrar la base de Liliana |
 | `feat/juan-seguimiento` | Juan Fernando | `main` **después** de integrar la base de Liliana |
 

@@ -249,3 +249,23 @@ Resultado en el equipo de Liliana:
 Nota: en la prueba manual se usaron nombres y teléfonos reales; para la demo se usarán solo datos ficticios.
 **Fase 5 verificada en el equipo de Liliana.**
 
+## Fase 6 — Repositorio en GitHub (2026-11-03)
+
+Repositorio público `G1_Mensajeria_Urbana` (cuenta de Liliana), sin README, `.gitignore` ni licencia
+generados por GitHub. Colaboradores invitados: Camila Perrazo y Juan Fernando Jaramillo.
+
+| Paso | Resultado en el equipo de Liliana |
+| --- | --- |
+| Commit inicial en `main` (`781a04e`) | 70 archivos de infraestructura compartida; `git check-ignore` confirmó que `.env` no se sube |
+| Rama `feat/liliana-envios` | 3 commits: `334ea8d` API, `2b0bdc3` pantallas, `d1051ee` pruebas y documentación; 35/35 pruebas antes de los commits |
+| Carpeta de trabajo | Se pasó a `C:\Proyectos\G1_Mensajeria_Urbana`; mismos volúmenes `mensajeria_*`, datos conservados |
+| Pull Request #1 | Revisado y aprobado por Camila; unido con *merge commit* (`f72f281`); la rama se conserva |
+| `main` local tras `fetch` + `merge` | Avance rápido a `f72f281`; 35/35 pruebas |
+
+## Fase 7 — Guías para el equipo (2026-11-03)
+
+Se agregan `docs/guia-equipo.md` (resumen de las Fases 1 a 6, arranque, contratos compartidos, Git y PR),
+`docs/guia-camila.md` (Dominios 2 y 5) y `docs/guia-juan.md` (Dominios 3, 4 y 6). Solo describen lo que pide
+el enunciado, lo que ya existe y el orden sugerido; no implementan nada de sus módulos. Se actualizan
+`colaboracion.md`, `consistencia.md` (creación idempotente resuelta con D32) y el README de migraciones.
+

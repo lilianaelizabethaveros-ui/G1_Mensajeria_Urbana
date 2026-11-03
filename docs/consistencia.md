@@ -81,7 +81,7 @@ nunca sustituye a la evidencia.
 
 | Operación | ¿Reintento seguro? | Mecanismo |
 | --- | --- | --- |
-| Crear envío | Se define en la Fase 5 (propuesta: clave de idempotencia) | — |
+| Crear envío | Sí | Encabezado `Idempotency-Key` (UUID) guardado como `UNIQUE` (D32) |
 | Cambio de estado | Sí | Transición condicionada al estado actual |
 | Registrar evidencia | Sí | `clave_evidencia` como `_id` |
 | Sincronizar outbox | Sí | `_id` = id del evento |

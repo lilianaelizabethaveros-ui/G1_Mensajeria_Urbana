@@ -52,10 +52,15 @@ El navegador nunca se conecta a las bases de datos. Detalle en [docs/arquitectur
 
 ## Puesta en marcha (PowerShell)
 
-Abre Docker Desktop y espera a que diga *Engine running*. Luego, en la carpeta del proyecto:
+Abre Docker Desktop y espera a que diga *Engine running*. Luego:
 
 ```powershell
+# Solo la primera vez: descargar el repositorio
+git clone https://github.com/lilianaelizabethaveros-ui/G1_Mensajeria_Urbana.git
+cd G1_Mensajeria_Urbana
+
 # Solo la primera vez: crear tu archivo de variables local (no se sube a GitHub)
+# y cambiar las claves "cambia_esta_clave_local" por claves inventadas
 Copy-Item .env.example .env
 
 # Construir la imagen de la API e iniciar todo en segundo plano
@@ -133,6 +138,7 @@ Los datos viven en los volúmenes `mensajeria_pg_data`, `mensajeria_mongo_data` 
 - [Fuente oficial de cada dato](docs/source-of-truth.md)
 - [Consistencia: entregas y outbox](docs/consistencia.md)
 - [API REST](docs/api.md)
+- [Guía de inicio para el equipo](docs/guia-equipo.md) · [Camila](docs/guia-camila.md) · [Juan Fernando](docs/guia-juan.md)
 - [Migraciones PostgreSQL](database/postgres/migrations/README.md)
 - [Colaboración con Git y GitHub](docs/colaboracion.md)
 - [Bitácora de decisiones](docs/bitacora-decisiones.md)
