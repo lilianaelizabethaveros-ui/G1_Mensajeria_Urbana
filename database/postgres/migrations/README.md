@@ -37,7 +37,7 @@ SELECT version, nombre, aplicada_en FROM schema_migrations ORDER BY version;
 | Archivo | Responsable | Fase |
 | --- | --- | --- |
 | `001_base.sql` — tablas `zonas`, `tipos_servicio` y `outbox` | Compartido | 4 (creada) |
-| `002_envios.sql` — tabla `envios` e índices | Liliana | 5 |
+| `002_envios.sql` — tabla `envios` e índices | Liliana | 5 (creada) |
 | `090_semilla_catalogos.sql` — 4 zonas y 3 tipos de servicio ficticios | Compartido | 4 (creada) |
 | `1NN_*.sql` — repartidores, asignaciones | Camila | posterior |
 | `2NN_*.sql` — referencias de evidencia, si hicieran falta | Juan Fernando | posterior |
