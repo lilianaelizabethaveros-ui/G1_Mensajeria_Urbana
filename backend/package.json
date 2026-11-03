@@ -1,0 +1,20 @@
+{
+  "name": "mensajeria-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API REST del Proyecto B (mensajería urbana) - persistencia políglota",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "mongodb": "^7.8.0",
+    "pg": "^8.23.1",
+    "redis": "^6.3.1"
+  }
+}

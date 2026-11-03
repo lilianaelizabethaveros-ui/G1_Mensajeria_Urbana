@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mensajería Urbana · Inicio</title>
+  <meta name="description" content="Proyecto B · Persistencia políglota · Grupo 1 · ESPE">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a8a'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <!-- Barra superior -->
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <span class="barra__etiqueta">Datos 100 % ficticios</span>
+    </div>
+  </header>
+
+  <!-- Portada -->
+  <section class="portada">
+    <div class="contenedor portada__contenido">
+      <div class="portada__texto">
+        <p class="sobretitulo">Universidad de las Fuerzas Armadas ESPE · Modelado Avanzado de Base de Datos</p>
+        <h1>Envíos urbanos con <span class="resaltado">persistencia políglota</span></h1>
+        <p class="portada__descripcion">
+          Registro de solicitudes, despacho a repartidores, seguimiento por eventos y evidencias de entrega,
+          sobre PostgreSQL, MongoDB y Redis detrás de una única API REST.
+        </p>
+        <div class="equipo" aria-label="Integrantes del Grupo 1">
+          <span class="equipo__titulo">Proyecto B · Grupo 1</span>
+          <ul class="equipo__lista">
+            <li class="persona"><span class="avatar avatar--liliana" aria-hidden="true">LA</span>Liliana Averos</li>
+            <li class="persona"><span class="avatar avatar--camila" aria-hidden="true">CP</span>Camila Perrazo</li>
+            <li class="persona"><span class="avatar avatar--juan" aria-hidden="true">JJ</span>Juan Fernando Jaramillo</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Arquitectura en miniatura -->
+      <figure class="arquitectura" aria-label="Arquitectura: navegador, API REST y tres gestores">
+        <div class="arq__nodo arq__nodo--web">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8"/></svg>
+          <span>Web<small>HTML · CSS · JavaScript</small></span>
+        </div>
+        <div class="arq__flecha" aria-hidden="true"></div>
+        <div class="arq__nodo arq__nodo--api">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13 5l-2 14"/></svg>
+          <span>API REST<small>Node.js · Express</small></span>
+        </div>
+        <div class="arq__flecha" aria-hidden="true"></div>
+        <div class="arq__gestores">
+          <div class="arq__nodo arq__nodo--pg"><span>PostgreSQL<small>Envíos · despacho</small></span></div>
+          <div class="arq__nodo arq__nodo--mongo"><span>MongoDB<small>Eventos · evidencias</small></span></div>
+          <div class="arq__nodo arq__nodo--redis"><span>Redis<small>Estado temporal</small></span></div>
+        </div>
+        <figcaption>El navegador solo habla con la API, nunca con las bases de datos.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <main class="contenedor">
+    <!-- Pantallas -->
+    <section class="seccion" aria-labelledby="titulo-pantallas">
+      <div class="seccion__cabecera">
+        <h2 id="titulo-pantallas">Pantallas del sistema</h2>
+        <p>Cada integrante desarrolla sus pantallas y su módulo de la API.</p>
+      </div>
+      <ul class="modulos">
+        <li class="modulo modulo--liliana">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg>
+          </div>
+          <h3>Solicitar envío</h3>
+          <p>Registrar origen, destino y tipo de servicio; obtener el código único y el comprobante.</p>
+          <div class="modulo__pie"><span class="responsable">Liliana Averos</span><span class="estado-chip">Próximamente</span></div>
+        </li>
+        <li class="modulo modulo--juan">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6H15a3 3 0 010 6H9a3 3 0 000 6h6.5"/></svg>
+          </div>
+          <h3>Seguimiento</h3>
+          <p>Consultar por código la línea de tiempo de un envío: retiro, tránsito, incidencias y entrega.</p>
+          <div class="modulo__pie"><span class="responsable">Juan Fernando Jaramillo</span><span class="estado-chip">En desarrollo</span></div>
+        </li>
+        <li class="modulo modulo--camila">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg>
+          </div>
+          <h3>Panel de despacho</h3>
+          <p>Lista de envíos pendientes con filtros y asignación a repartidores según su capacidad.</p>
+          <div class="modulo__pie"><span class="responsable">Camila Perrazo</span><span class="estado-chip">En desarrollo</span></div>
+        </li>
+        <li class="modulo modulo--juan">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l4-8h4l4 8M10 9L9 6H7"/></svg>
+          </div>
+          <h3>Vista del repartidor</h3>
+          <p>Tareas asignadas, cambios de estado y registro de la evidencia de entrega.</p>
+          <div class="modulo__pie"><span class="responsable">Juan Fernando Jaramillo</span><span class="estado-chip">En desarrollo</span></div>
+        </li>
+        <li class="modulo modulo--camila">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6M3 20h18"/></svg>
+          </div>
+          <h3>Panel administrativo</h3>
+          <p>Mantenimiento de zonas, repartidores y capacidad operativa.</p>
+          <div class="modulo__pie"><span class="responsable">Camila Perrazo</span><span class="estado-chip">En desarrollo</span></div>
+        </li>
+        <li class="modulo modulo--juan">
+          <div class="modulo__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5M9 16l2 2 4-4"/></svg>
+          </div>
+          <h3>Detalle de envío</h3>
+          <p>Estado vigente, historial completo y evidencia de entrega, sin contradicciones.</p>
+          <div class="modulo__pie"><span class="responsable">Juan Fernando Jaramillo</span><span class="estado-chip">En desarrollo</span></div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Estado del sistema -->
+    <section class="seccion" aria-labelledby="titulo-estado">
+      <div class="seccion__cabecera seccion__cabecera--fila">
+        <div>
+          <h2 id="titulo-estado">Estado del sistema</h2>
+          <p>Consulta en vivo de <code>GET /health</code>, sin credenciales. <span id="actualizado" class="tenue"></span></p>
+        </div>
+        <button id="actualizar" type="button" class="boton boton--secundario">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg>
+          Actualizar
+        </button>
+      </div>
+
+      <div id="resumen" class="resumen" role="status" aria-live="polite">
+        <span class="punto" aria-hidden="true"></span><span id="resumen-texto">Consultando…</span>
+      </div>
+
+      <div class="gestores">
+        <article class="gestor" data-gestor="postgres">
+          <div class="gestor__cabecera"><span class="gestor__nombre">PostgreSQL</span><span class="gestor__estado">—</span></div>
+          <p class="gestor__rol">Fuente oficial de envíos, despacho y outbox</p>
+          <p class="gestor__ms">—</p>
+        </article>
+        <article class="gestor" data-gestor="mongo">
+          <div class="gestor__cabecera"><span class="gestor__nombre">MongoDB</span><span class="gestor__estado">—</span></div>
+          <p class="gestor__rol">Eventos de seguimiento y evidencias</p>
+          <p class="gestor__ms">—</p>
+        </article>
+        <article class="gestor" data-gestor="redis">
+          <div class="gestor__cabecera"><span class="gestor__nombre">Redis</span><span class="gestor__estado">—</span></div>
+          <p class="gestor__rol">Ubicación y conexión de repartidores (con expiración)</p>
+          <p class="gestor__ms">—</p>
+        </article>
+      </div>
+
+      <div class="indicadores">
+        <div class="indicador">
+          <span class="indicador__valor" id="outbox-pendientes">—</span>
+          <span class="indicador__texto">
+            <span class="indicador__nombre">Eventos pendientes de sincronizar a MongoDB</span>
+            <span class="indicador__detalle" id="outbox-detalle"></span>
+          </span>
+        </div>
+        <div class="indicador">
+          <span class="indicador__valor" id="migraciones-total">—</span>
+          <span class="indicador__texto">
+            <span class="indicador__nombre">Migraciones de PostgreSQL aplicadas</span>
+            <span class="indicador__detalle" id="migraciones-detalle"></span>
+          </span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Empresa de mensajería urbana · Grupo 1 · ESPE</span>
+      <span>Liliana Averos · Camila Perrazo · Juan Fernando Jaramillo</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/inicio.js"></script>
+</body>
+</html>

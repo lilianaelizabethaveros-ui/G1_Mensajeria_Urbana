@@ -1,0 +1,11 @@
+# Lo que NO entra en la imagen de la API
+.git
+.env
+.env.*
+!.env.example
+**/node_modules
+**/npm-debug.log*
+docs
+tests
+*.md
+!database/**/*.md

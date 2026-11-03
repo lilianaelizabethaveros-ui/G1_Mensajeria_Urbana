@@ -1,0 +1,132 @@
+# ------------------------------------------------------------------
+# Proyecto B · Mensajería urbana · Grupo 1
+# Servicios: postgres, mongo, redis (persistencia) y api (Express + web).
+#
+# Uso:   Copy-Item .env.example .env      (solo la primera vez)
+#        docker compose up --build -d
+# NUNCA usar "docker compose down -v" salvo que se quiera BORRAR los datos.
+# ------------------------------------------------------------------
+name: mensajeria
+
+services:
+
+  # Fuente oficial: envíos, catálogos, despacho, outbox
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Falta POSTGRES_DB en .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      TZ: America/Guayaquil
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      # Solo accesible desde este equipo (DBeaver). La API usa la red interna.
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
+    networks: [red]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Eventos de seguimiento y evidencias de entrega
+  mongo:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:?Falta MONGO_INITDB_ROOT_USERNAME en .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Falta MONGO_INITDB_ROOT_PASSWORD en .env}
+      TZ: America/Guayaquil
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      # 27018 en el equipo para no chocar con un MongoDB instalado en Windows (27017).
+      - "127.0.0.1:${MONGO_HOST_PORT:-27018}:27017"
+    networks: [red]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Estado temporal de repartidores (claves con expiración)
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}"]
+    environment:
+      # Permite que redis-cli (healthcheck) se autentique sin mostrar la clave.
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}
+      TZ: America/Guayaquil
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-6379}:6379"
+    networks: [red]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # API REST + web estática. Única puerta de entrada para el navegador.
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    # Modo desarrollo: recarga al guardar cambios en backend/src.
+    command: ["node", "--watch", "src/server.js"]
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      TZ: America/Guayaquil
+      # Dentro de la red interna, cada gestor se alcanza por el nombre de su servicio.
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:?Falta POSTGRES_DB en .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGO_DB:?Falta MONGO_DB en .env}
+      MONGO_USER: ${MONGO_INITDB_ROOT_USERNAME:?Falta MONGO_INITDB_ROOT_USERNAME en .env}
+      MONGO_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Falta MONGO_INITDB_ROOT_PASSWORD en .env}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}
+    volumes:
+      # El código se monta desde tu carpeta: no hace falta reconstruir para ver cambios.
+      - ./backend/src:/app/src:ro
+      - ./frontend:/app/frontend:ro
+      - ./database:/app/database:ro
+    ports:
+      - "127.0.0.1:${API_PORT:-3000}:3000"
+    networks: [red]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health > /dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+networks:
+  red:
+    driver: bridge
+
+volumes:
+  pg_data:
+  mongo_data:
+  redis_data:

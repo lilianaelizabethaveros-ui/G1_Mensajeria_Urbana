@@ -1,0 +1,18 @@
+# Variables locales con contraseñas: NUNCA se suben
+.env
+.env.*
+!.env.example
+
+# Dependencias y artefactos
+node_modules/
+npm-debug.log*
+logs/
+*.log
+coverage/
+
+# Sistema operativo y editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
