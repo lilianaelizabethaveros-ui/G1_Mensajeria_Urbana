@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solicitar envío · Mensajería Urbana</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a8a'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header class="barra no-imprimir">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación principal">
+          <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/envios/solicitud.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg><span>Solicitar envío</span></a>
+          <a href="/envios/consulta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg><span>Gestionar solicitud</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas"><a href="/">Inicio</a> / Solicitar envío</p>
+      <h1>Solicitar un envío</h1>
+      <p>Completa los datos de quien envía, de quien recibe y del paquete. Al registrar la solicitud obtendrás un código único para seguirla.</p>
+    </div>
+  </section>
+
+  <main class="contenedor cuerpo-pagina">
+    <form id="formulario" class="formulario" novalidate>
+      <div id="mensaje" class="oculto" role="alert" tabindex="-1"></div>
+
+      <section class="panel" aria-labelledby="t-remitente">
+        <h2 class="panel__titulo" id="t-remitente"><span class="panel__numero">1</span>Remitente y punto de retiro</h2>
+        <div class="rejilla">
+          <div class="campo">
+            <label for="remitente_nombre">Nombre de quien envía</label>
+            <input id="remitente_nombre" name="remitente_nombre" autocomplete="off" maxlength="80" required placeholder="Ej.: Ana Ficticia">
+            <span class="error-campo" data-error="remitente_nombre"></span>
+          </div>
+          <div class="campo">
+            <label for="remitente_telefono">Teléfono</label>
+            <input id="remitente_telefono" name="remitente_telefono" inputmode="numeric" autocomplete="off" maxlength="10" required placeholder="0990000001">
+            <span class="ayuda">9 o 10 dígitos, empieza con 0. Usa un número ficticio.</span>
+            <span class="error-campo" data-error="remitente_telefono"></span>
+          </div>
+          <div class="campo">
+            <label for="origen_direccion">Dirección de retiro</label>
+            <input id="origen_direccion" name="origen_direccion" autocomplete="off" maxlength="160" required placeholder="Ej.: Calle Ficticia 123 y Av. Imaginaria">
+            <span class="error-campo" data-error="origen_direccion"></span>
+          </div>
+          <div class="campo">
+            <label for="origen_zona">Zona de retiro</label>
+            <select id="origen_zona" name="origen_zona" required data-zonas><option value="">Cargando zonas…</option></select>
+            <span class="error-campo" data-error="origen_zona"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="t-destinatario">
+        <h2 class="panel__titulo" id="t-destinatario"><span class="panel__numero">2</span>Destinatario y punto de entrega</h2>
+        <div class="rejilla">
+          <div class="campo">
+            <label for="destinatario_nombre">Nombre de quien recibe</label>
+            <input id="destinatario_nombre" name="destinatario_nombre" autocomplete="off" maxlength="80" required placeholder="Ej.: Luis Inventado">
+            <span class="error-campo" data-error="destinatario_nombre"></span>
+          </div>
+          <div class="campo">
+            <label for="destinatario_telefono">Teléfono</label>
+            <input id="destinatario_telefono" name="destinatario_telefono" inputmode="numeric" autocomplete="off" maxlength="10" required placeholder="0990000002">
+            <span class="ayuda">9 o 10 dígitos, empieza con 0. Usa un número ficticio.</span>
+            <span class="error-campo" data-error="destinatario_telefono"></span>
+          </div>
+          <div class="campo">
+            <label for="destino_direccion">Dirección de entrega</label>
+            <input id="destino_direccion" name="destino_direccion" autocomplete="off" maxlength="160" required placeholder="Ej.: Pasaje Ejemplo 45">
+            <span class="error-campo" data-error="destino_direccion"></span>
+          </div>
+          <div class="campo">
+            <label for="destino_zona">Zona de entrega</label>
+            <select id="destino_zona" name="destino_zona" required data-zonas><option value="">Cargando zonas…</option></select>
+            <span class="error-campo" data-error="destino_zona"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="t-paquete">
+        <h2 class="panel__titulo" id="t-paquete"><span class="panel__numero">3</span>Paquete y tipo de servicio</h2>
+        <div class="formulario">
+          <fieldset class="campo campo--grupo">
+            <legend>Tipo de servicio</legend>
+            <div id="servicios" class="servicios">
+              <p class="tenue">Cargando tipos de servicio…</p>
+            </div>
+            <span class="error-campo" data-error="tipo_servicio"></span>
+          </fieldset>
+          <div class="rejilla rejilla--3">
+            <div class="campo">
+              <label for="descripcion">Descripción del contenido</label>
+              <input id="descripcion" name="descripcion" autocomplete="off" maxlength="160" required placeholder="Ej.: Documentos en sobre manila">
+              <span class="error-campo" data-error="descripcion"></span>
+            </div>
+            <div class="campo">
+              <label for="peso_kg">Peso (kg)</label>
+              <input id="peso_kg" name="peso_kg" type="number" inputmode="decimal" min="0.01" step="0.01" required placeholder="1.5">
+              <span class="ayuda" id="ayuda-peso">Elige un servicio para ver el peso máximo.</span>
+              <span class="error-campo" data-error="peso_kg"></span>
+            </div>
+            <div class="campo">
+              <label>Entrega estimada</label>
+              <input id="estimado" readonly tabindex="-1" value="—" aria-describedby="ayuda-estimado">
+              <span class="ayuda" id="ayuda-estimado">Se calcula desde el registro.</span>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="observaciones">Observaciones <span class="opcional">(opcional)</span></label>
+            <textarea id="observaciones" name="observaciones" maxlength="300" placeholder="Ej.: Tocar el timbre del segundo piso"></textarea>
+            <span class="ayuda"><span id="contador">0</span>/300 caracteres</span>
+            <span class="error-campo" data-error="observaciones"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="panel acciones">
+        <p class="acciones__nota">Los datos se validan en la API antes de guardarse. Si el envío no se completa, puedes volver a intentar sin crear duplicados.</p>
+        <button id="enviar" type="submit" class="boton boton--grande">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+          Registrar solicitud
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="pie no-imprimir">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Empresa de mensajería urbana · Grupo 1 · ESPE</span>
+      <span>Dominio 1 · Solicitudes y envíos · Liliana Averos</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/envios/solicitud.js"></script>
+</body>
+</html>

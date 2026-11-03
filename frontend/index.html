@@ -19,7 +19,14 @@
         </svg>
         <span>Mensajería <strong>Urbana</strong></span>
       </a>
-      <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación principal">
+          <a href="/" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/envios/solicitud.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg><span>Solicitar envío</span></a>
+          <a href="/envios/consulta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg><span>Gestionar solicitud</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
     </div>
   </header>
 
@@ -73,13 +80,14 @@
         <p>Cada integrante desarrolla sus pantallas y su módulo de la API.</p>
       </div>
       <ul class="modulos">
-        <li class="modulo modulo--liliana">
+        <li class="modulo modulo--liliana modulo--activo">
           <div class="modulo__icono" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg>
           </div>
-          <h3>Solicitar envío</h3>
+          <h3><a class="modulo__enlace" href="/envios/solicitud.html">Solicitar envío</a></h3>
           <p>Registrar origen, destino y tipo de servicio; obtener el código único y el comprobante.</p>
-          <div class="modulo__pie"><span class="responsable">Liliana Averos</span><span class="estado-chip">Próximamente</span></div>
+          <a class="modulo__extra" href="/envios/consulta.html">Gestionar una solicitud existente →</a>
+          <div class="modulo__pie"><span class="responsable">Liliana Averos</span><span class="estado-chip estado-chip--listo">Disponible</span></div>
         </li>
         <li class="modulo modulo--juan">
           <div class="modulo__icono" aria-hidden="true">

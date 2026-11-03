@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestionar solicitud · Mensajería Urbana</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a8a'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header class="barra no-imprimir">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación principal">
+          <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/envios/solicitud.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg><span>Solicitar envío</span></a>
+          <a href="/envios/consulta.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg><span>Gestionar solicitud</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas"><a href="/">Inicio</a> / Gestionar solicitud</p>
+      <h1>Gestionar una solicitud</h1>
+      <p>Busca una solicitud por su código para ver su comprobante, aceptarla como operador o cancelarla antes de que se asigne a un repartidor.</p>
+    </div>
+  </section>
+
+  <main class="contenedor cuerpo-pagina">
+    <section class="panel no-imprimir" aria-labelledby="t-buscar">
+      <h2 class="panel__titulo" id="t-buscar"><span class="panel__numero">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg>
+      </span>Buscar por código</h2>
+      <form id="buscar" class="busqueda" novalidate>
+        <label for="codigo" class="oculto">Código de envío</label>
+        <input id="codigo" name="codigo" autocomplete="off" spellcheck="false" maxlength="12" placeholder="ENV-XXXXXXXX" aria-describedby="ayuda-codigo">
+        <button type="submit" class="boton boton--grande">Buscar</button>
+      </form>
+      <p class="ayuda tenue" id="ayuda-codigo" style="margin-top:8px;font-size:.84rem">Formato: ENV- seguido de 8 caracteres. Puedes escribirlo en minúsculas.</p>
+    </section>
+
+    <div id="mensaje" class="oculto" role="alert"></div>
+    <div id="resultado" aria-live="polite" style="margin-top:18px"></div>
+
+    <section id="operaciones" class="panel no-imprimir oculto" aria-labelledby="t-operaciones" style="margin-top:18px">
+      <h2 class="panel__titulo" id="t-operaciones"><span class="panel__numero">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2L14 3h-4l-.5 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 000 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 002 1.2L10 21h4l.5-2.6a7 7 0 002-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>
+      </span>Operaciones de la solicitud</h2>
+      <div class="acciones-operador">
+        <div class="accion" id="accion-aceptar">
+          <h3>Aceptar solicitud</h3>
+          <p>El operador revisa los datos y deja la solicitud lista para despacho (CREADO → ACEPTADO).</p>
+          <p class="error-campo" id="nota-aceptar"></p>
+          <div><button id="boton-aceptar" type="button" class="boton boton--exito">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Aceptar como operador</button></div>
+        </div>
+        <form class="accion" id="accion-cancelar" novalidate>
+          <h3>Cancelar solicitud</h3>
+          <p>Solo mientras no tenga repartidor asignado (CREADO o ACEPTADO → CANCELADO).</p>
+          <div class="campo">
+            <label for="motivo">Motivo</label>
+            <textarea id="motivo" name="motivo" maxlength="200" placeholder="Ej.: El cliente ya no necesita el envío" style="min-height:64px"></textarea>
+            <span class="error-campo" data-error="motivo"></span>
+          </div>
+          <div class="campo">
+            <label for="actor">Quién cancela</label>
+            <select id="actor" name="actor"><option value="CLIENTE">Cliente</option><option value="OPERADOR">Operador</option></select>
+          </div>
+          <p class="error-campo" id="nota-cancelar"></p>
+          <div><button id="boton-cancelar" type="submit" class="boton boton--peligro">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Cancelar solicitud</button></div>
+        </form>
+      </div>
+      <div class="aviso-nota" style="margin-top:18px">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+        <span>Desde ASIGNADO en adelante, el envío lo gestionan Despacho (Camila Perrazo) y Seguimiento (Juan Fernando Jaramillo). Cada cambio queda registrado como evento en la outbox de PostgreSQL.</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie no-imprimir">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Empresa de mensajería urbana · Grupo 1 · ESPE</span>
+      <span>Dominio 1 · Solicitudes y envíos · Liliana Averos</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/envios/consulta.js"></script>
+</body>
+</html>

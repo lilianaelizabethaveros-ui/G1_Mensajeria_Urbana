@@ -6,6 +6,6 @@ Solo se comunica con la API (`js/api.js`), nunca con las bases de datos, y no co
 | Carpeta | Responsable | Pantallas del enunciado |
 | --- | --- | --- |
 | `index.html`, `css/`, `js/` | Compartido | Menú de inicio, estilos y cliente de la API |
-| `envios/` | Liliana | Formulario de solicitud y pantalla de confirmación |
+| `envios/` | Liliana | `solicitud.html` (formulario), `confirmacion.html` (comprobante), `consulta.html` (gestionar: aceptar o cancelar); `envios.js` con funciones compartidas |
 | `despacho/` | Camila | Panel de despacho; panel administrativo |
 | `seguimiento/` | Juan Fernando | Seguimiento por código; detalle de envío; vista de repartidor |
