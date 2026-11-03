@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de despacho · Mensajería Urbana</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/despacho/despacho.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/">
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <span class="barra__etiqueta">Datos 100 % ficticios</span>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas">
+        <a href="/">Inicio</a> / Panel de despacho
+      </p>
+      <h1>Panel de despacho</h1>
+      <p>
+        Consulta los envíos pendientes y asígnalos a
+        repartidores según su zona y capacidad.
+      </p>
+    </div>
+  </section>
+
+  <main class="contenedor cuerpo-pagina">
+    <!-- Notificaciones de las operaciones del despacho. -->
+    <div id="mensaje" class="oculto" role="status" aria-live="polite"></div>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Envíos pendientes</h2>
+      <div class="rejilla">
+        <div class="campo">
+          <label for="filtro_codigo">Buscar por código</label>
+          <input
+            id="filtro_codigo"
+            type="search"
+            placeholder="Ej.: ENV-SXGSTQMC"
+          >
+        </div>
+        <div class="campo">
+          <label for="filtro_zona">Filtrar por zona</label>
+          <select id="filtro_zona">
+            <option value="">Todas las zonas</option>
+            <option value="NORTE">NORTE</option>
+            <option value="CENTRO">CENTRO</option>
+            <option value="SUR">SUR</option>
+            <option value="VALLE">VALLE</option>
+          </select>
+        </div>
+      </div>
+      <div id="pendientes">
+        <p class="tenue">Cargando envíos pendientes...</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Asignar repartidor</h2>
+
+      <form id="formulario-asignacion" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="codigo_envio">Código de envío</label>
+            <input
+              id="codigo_envio"
+              name="codigo_envio"
+              required
+              placeholder="ENV-XXXXXXXX"
+            >
+          </div>
+
+          <div class="campo">
+            <label for="codigo_repartidor">Repartidor</label>
+            <select id="codigo_repartidor"
+                    name="codigo_repartidor" required>
+              <option value="">Cargando repartidores...</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="boton">
+          Asignar repartidor
+        </button>
+      </form>
+    </section>
+
+    
+    <section class="panel">
+    <h2 class="panel__titulo">Liberar asignación</h2>
+
+    <form id="formulario-liberacion" class="formulario">
+        <div class="campo">
+        <label for="codigo_liberar">Código del envío asignado</label>
+        <input
+            id="codigo_liberar"
+            name="codigo_liberar"
+            required
+            placeholder="ENV-XXXXXXXX"
+        >
+        </div>
+
+        <button type="submit" class="boton">
+        Liberar repartidor
+        </button>
+    </form>
+    </section>
+
+    <section class="panel">
+    <h2 class="panel__titulo">Reasignar envío</h2>
+
+    <form id="formulario-reasignacion" class="formulario">
+        <div class="rejilla">
+        <div class="campo">
+            <label for="codigo_reasignar">Código del envío asignado</label>
+            <input
+            id="codigo_reasignar"
+            name="codigo_reasignar"
+            required
+            placeholder="ENV-XXXXXXXX"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="nuevo_repartidor">Nuevo repartidor</label>
+            <select id="nuevo_repartidor" required>
+            <option value="">Selecciona un repartidor</option>
+            </select>
+        </div>
+        </div>
+
+        <button type="submit" class="boton">
+        Reasignar envío
+        </button>
+    </form>
+    </section>
+
+
+    <section class="panel">
+      <h2 class="panel__titulo">Repartidores registrados</h2>
+      <div class="tabla-contenedor">
+        <table class="tabla-repartidores">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Repartidor</th>
+              <th>Zona</th>
+              <th>Carga actual</th>
+              <th>Cupos libres</th>
+            </tr>
+          </thead>
+          <tbody id="repartidores">
+            <tr>
+              <td colspan="5">Cargando repartidores...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Grupo 1 · ESPE</span>
+      <span>Dominio 2 · Despacho · Camila Perrazo</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/despacho/despacho.js"></script>
+</body>
+</html>

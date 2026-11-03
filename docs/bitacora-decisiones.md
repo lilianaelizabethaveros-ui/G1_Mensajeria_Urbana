@@ -269,3 +269,80 @@ Se agregan `docs/guia-equipo.md` (resumen de las Fases 1 a 6, arranque, contrato
 el enunciado, lo que ya existe y el orden sugerido; no implementan nada de sus módulos. Se actualizan
 `colaboracion.md`, `consistencia.md` (creación idempotente resuelta con D32) y el README de migraciones.
 
+## Fase 8 — Dominio 2: despacho y asignaciones (2026-11-03)
+
+**Responsable:** Camila Perrazo.
+
+**Rama de trabajo:** `feat/camila-despacho`.
+
+### Implementación realizada
+
+- Migración `101_repartidores.sql`: repartidores, asignaciones y restricciones de integridad.
+- Migración `190_semilla_repartidores.sql`: repartidores ficticios iniciales.
+- Módulo `backend/src/modules/despacho/` con repositorio, servicio, controlador y rutas.
+- Panel de despacho en `frontend/despacho/index.html`.
+- Panel administrativo en `frontend/despacho/admin.html`.
+- Pruebas automatizadas en `tests/despacho.test.js`.
+- Documentación de endpoints en `docs/api.md`.
+
+### Funcionalidades verificadas
+
+| Funcionalidad | Resultado |
+| --- | --- |
+| Consultar envíos ACEPTADOS | Correcto |
+| Consultar repartidores y carga actual | Correcto |
+| Asignar envío a repartidor disponible | Correcto |
+| Impedir asignaciones cuando no hay capacidad | HTTP 409 |
+| Dos solicitudes simultáneas al último cupo | Solo una asignación exitosa |
+| Repetir asignación al mismo repartidor | HTTP 200, sin evento duplicado |
+| Liberar asignación | Vuelve a ACEPTADO |
+| Reasignar a otro repartidor | Correcto |
+| Crear y actualizar zonas | Correcto |
+| Crear y actualizar repartidores | Correcto |
+| Modificar capacidad máxima | Correcto |
+| Desactivar repartidor | Correcto |
+
+### Pruebas automatizadas
+
+Comando ejecutado:
+
+`node --test --test-concurrency=1 tests/api.test.js tests/contratos.test.js tests/envios.test.js tests/despacho.test.js`
+
+Resultado obtenido en el equipo de Camila:
+
+- 45 pruebas ejecutadas.
+- 45 aprobadas.
+- 0 fallidas.
+- 10 pruebas corresponden al Dominio 2.
+
+Se actualizó una prueba de `tests/api.test.js` que esperaba
+`501 NO_IMPLEMENTADO` para despacho, porque el módulo ya está
+implementado. Los módulos restantes siguen verificándose como pendientes.
+
+### Integridad de las asignaciones
+
+- PostgreSQL conserva el estado vigente del envío.
+- La asignación utiliza transacciones y bloqueos `FOR UPDATE`.
+- Se verifica la capacidad disponible antes de asignar.
+- Un índice único parcial impide dos asignaciones activas para un envío.
+- La reasignación conserva el historial de asignaciones.
+- Los eventos se registran mediante la outbox.
+
+### Integración pendiente
+
+Coordinar con Juan Fernando la liberación de la asignación activa
+y de la capacidad del repartidor cuando un envío pase a ENTREGADO.
+
+La decisión P3 sobre la cancelación de envíos ASIGNADOS
+permanece pendiente de acuerdo del equipo.
+
+### Próximo trabajo
+
+Implementar el Dominio 5 — Consulta operativa.
+Resolver la propuesta P2: índices PostgreSQL o vista derivada
+para los filtros de consulta.
+
+**Estado del Dominio 2:** implementado y probado;
+integración final con seguimiento pendiente de coordinación.
+
+

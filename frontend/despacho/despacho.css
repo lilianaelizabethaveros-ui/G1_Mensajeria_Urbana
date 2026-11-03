@@ -1,0 +1,54 @@
+/* Notificaciones del panel de despacho. */
+#mensaje:not(.oculto) {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 100;
+  width: min(360px, calc(100% - 48px));
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  border-left: 5px solid #1e3a8a;
+}
+
+#mensaje.mensaje--exito {
+  border-left-color: #16804a;
+}
+
+#mensaje.mensaje--error {
+  border-left-color: #c0262d;
+}
+
+
+/* Tabla de repartidores del panel de despacho. */
+.tabla-contenedor {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-repartidores {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabla-repartidores th,
+.tabla-repartidores td {
+  padding: 12px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla-repartidores th {
+  background: var(--azul-100);
+  color: var(--azul-700);
+  font-weight: 700;
+}
+
+.tabla-repartidores tbody tr:hover {
+  background: var(--fondo);
+}
+
+.tabla-repartidores td {
+  font-size: 0.9rem;
+}

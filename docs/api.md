@@ -66,7 +66,7 @@ Comprueba API, PostgreSQL, MongoDB y Redis (límite de 2 s por gestor), sin expo
 | --- | --- | --- | --- |
 | `/api/catalogos` | Zonas y tipos de servicio | Liliana | Implementado (Fase 5) |
 | `/api/envios` | Solicitudes y envíos | Liliana | Implementado (Fase 5) |
-| `/api/despacho` | Despacho y asignaciones | Camila | `501` pendiente |
+| `/api/despacho` | Despacho y asignaciones | Camila | Implementado y probado (Dominio 2) |
 | `/api/consulta` | Consulta operativa | Camila | `501` pendiente |
 | `/api/seguimiento` | Seguimiento y eventos | Juan Fernando | `501` pendiente |
 | `/api/evidencias` | Evidencias de entrega | Juan Fernando | `501` pendiente |
@@ -178,7 +178,160 @@ transacción**: si algo falla no queda ni el cambio ni el evento. Juan Fernando 
 
 ## Camila — Despacho y consulta
 
-*Pendiente.*
+### Dominio 2 — Despacho y asignaciones
+
+**Estado:** Implementado y probado.
+
+**Responsable:** Camila Perrazo.
+
+**Base de datos:** PostgreSQL.
+
+**Archivos principales:**
+- `backend/src/modules/despacho/despacho.repository.js`
+- `backend/src/modules/despacho/despacho.service.js`
+- `backend/src/modules/despacho/despacho.controller.js`
+- `backend/src/modules/despacho/despacho.routes.js`
+- `database/postgres/migrations/101_repartidores.sql`
+- `database/postgres/migrations/190_semilla_repartidores.sql`
+
+**Pantallas:**
+- `/despacho/index.html` — Panel de despacho.
+- `/despacho/admin.html` — Panel administrativo.
+
+### Endpoints de despacho
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| GET | `/api/despacho/pendientes` | Consultar envíos pendientes de asignación. |
+| GET | `/api/despacho/repartidores` | Consultar repartidores, capacidades y carga actual. |
+| POST | `/api/despacho/asignaciones` | Asignar un envío ACEPTADO a un repartidor disponible. |
+| PATCH | `/api/despacho/asignaciones/:codigo/liberar` | Liberar la asignación activa de un envío y regresarlo a ACEPTADO. |
+| PATCH | `/api/despacho/asignaciones/:codigo/reasignar` | Cambiar el repartidor asignado a un envío. |
+
+### Ejemplo: asignar un envío
+
+**POST** `/api/despacho/asignaciones`
+
+Cuerpo JSON:
+
+```json
+{
+  "codigo_envio": "ENV-XXXXXXXX",
+  "codigo_repartidor": "REP-001"
+}
+```
+
+`ENV-XXXXXXXX` representa un código de envío existente en estado ACEPTADO.
+
+**Resultados principales:**
+- `201`: asignación creada correctamente.
+- `200`: asignación repetida al mismo repartidor; operación idempotente.
+- `400`: datos de entrada inválidos.
+- `409`: conflicto de estado o capacidad agotada.
+
+La asignación comprueba que el envío esté en estado ACEPTADO,
+que el repartidor esté disponible y que exista capacidad suficiente.
+
+### Concurrencia e integridad
+
+Las operaciones de asignación emplean transacciones de PostgreSQL.
+
+Se bloquean los registros correspondientes mediante
+`SELECT ... FOR UPDATE` para evitar asignaciones incompatibles.
+
+Se verifica la carga actual antes de ocupar un cupo.
+
+La tabla `asignaciones` utiliza un índice único parcial
+sobre el código del envío cuando `liberada_en IS NULL`.
+Esto impide más de una asignación activa por envío.
+
+Los cambios de estado y los eventos de la outbox se registran
+dentro de la misma transacción.
+
+La reasignación libera la asignación anterior y registra
+la nueva asignación, conservando el historial.
+
+### Idempotencia D33
+
+Cuando se solicita nuevamente la asignación de un envío
+al mismo repartidor que ya lo tiene asignado:
+
+- Se responde HTTP 200.
+- No se crea una segunda asignación activa.
+- No se genera un segundo evento de asignación.
+
+### Endpoints administrativos
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| GET | `/api/despacho/admin/zonas` | Listar zonas registradas. |
+| POST | `/api/despacho/admin/zonas` | Crear una zona. |
+| PATCH | `/api/despacho/admin/zonas/:codigo` | Modificar el nombre y estado de una zona. |
+| POST | `/api/despacho/admin/repartidores` | Registrar un repartidor. |
+| PATCH | `/api/despacho/admin/repartidores/:codigo` | Actualizar nombre, zona, capacidad y estado del repartidor. |
+
+### Ejemplo: registrar un repartidor
+
+**POST** `/api/despacho/admin/repartidores`
+
+```json
+{
+  "codigo": "REP-008",
+  "nombre": "Repartidor de Ejemplo",
+  "zona": "NORTE",
+  "capacidad_maxima": 2
+}
+```
+
+La API valida el código, nombre, zona activa y capacidad positiva.
+
+### Capacidad operativa
+
+El sistema consulta la cantidad de asignaciones activas
+de cada repartidor y calcula sus cupos disponibles.
+
+Al actualizar la capacidad máxima, se comprueba que
+el nuevo valor no sea inferior a la carga actual.
+
+El panel administrativo permite activar o desactivar
+repartidores y zonas, además de actualizar sus datos.
+
+### Pruebas automatizadas
+
+**Archivo:** `tests/despacho.test.js`
+
+**Ejecutar desde la raíz del proyecto:**
+
+```bash
+node --test tests/despacho.test.js
+```
+
+**Resultado verificado:** 10 pruebas aprobadas, 0 fallidas.
+
+Las pruebas comprueban:
+- Asignación válida.
+- Idempotencia D33.
+- Rechazo por capacidad agotada (HTTP 409).
+- Asignaciones simultáneas al último cupo.
+- Reasignación.
+- Liberación de capacidad.
+- Consulta de carga operativa.
+- Disponibilidad de las pantallas del Dominio 2.
+
+Las pruebas generan información ficticia en la base
+de datos local y no eliminan automáticamente sus registros.
+
+### Integración pendiente con otros dominios
+
+Se debe coordinar con el responsable de seguimiento
+la liberación de capacidad al registrar una entrega.
+
+La consulta operativa del Dominio 5 se documentará
+cuando sus endpoints y filtros estén implementados.
+
+### Dominio 5 — Consulta operativa
+
+*Pendiente de implementación.*
 
 ## Juan Fernando — Seguimiento, evidencias y estado temporal
 

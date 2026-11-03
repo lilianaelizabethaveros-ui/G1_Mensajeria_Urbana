@@ -38,13 +38,29 @@ test('Ruta /api inexistente: 404 con formato de error uniforme', async () => {
   assert.equal(cuerpo.error.codigo, 'NO_ENCONTRADO');
 });
 
-test('Módulos de Camila y Juan Fernando registrados y pendientes: 501', async () => {
-  for (const prefijo of ['despacho', 'consulta', 'seguimiento', 'evidencias', 'estado-temporal']) {
+
+test('Dominio 2 de Camila implementado y módulos pendientes con 501', async () => {
+  // El Dominio 2 ya está implementado.
+  const despacho = await pedir('/api/despacho/repartidores');
+
+  assert.equal(despacho.status, 200);
+  assert.equal(despacho.cuerpo.ok, true);
+  assert.ok(Array.isArray(despacho.cuerpo.datos));
+
+  // Estos módulos todavía están pendientes.
+  for (const prefijo of [
+    'consulta',
+    'seguimiento',
+    'evidencias',
+    'estado-temporal'
+  ]) {
     const { status, cuerpo } = await pedir(`/api/${prefijo}`);
+
     assert.equal(status, 501, prefijo);
     assert.equal(cuerpo.error.codigo, 'NO_IMPLEMENTADO');
   }
 });
+
 
 test('JSON mal formado: 400 JSON_INVALIDO', async () => {
   const { status, cuerpo } = await pedir('/api/despacho', {
