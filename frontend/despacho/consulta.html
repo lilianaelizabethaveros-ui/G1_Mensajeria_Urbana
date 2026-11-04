@@ -10,10 +10,22 @@
 <body>
   <header class="barra">
     <div class="contenedor barra__contenido">
-      <a class="marca" href="/">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
         <span>Mensajería <strong>Urbana</strong></span>
       </a>
-      <span class="barra__etiqueta">Consulta operativa</span>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación de despacho">
+          <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/despacho/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3z M3 9h18 M8 13h3 M8 16h6"/></svg><span>Despacho</span></a>
+          <a href="/despacho/consulta.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg><span>Consulta</span></a>
+          <a href="/despacho/admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6M3 20h18"/></svg><span>Administración</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
     </div>
   </header>
 
