@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consulta operativa · Mensajería Urbana</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/despacho/despacho.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/">
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <span class="barra__etiqueta">Consulta operativa</span>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas">
+        <a href="/">Inicio</a> /
+        <a href="/despacho/index.html">Despacho</a> /
+        Consulta operativa
+      </p>
+      <h1>Consulta operativa de envíos</h1>
+      <p>Busca y filtra los envíos registrados en PostgreSQL.</p>
+    </div>
+  </section>
+
+  <div id="mensaje" class="oculto" role="status" aria-live="polite"></div>
+
+  <main class="contenedor cuerpo-pagina">
+    <section class="panel">
+      <h2 class="panel__titulo">Filtros de búsqueda</h2>
+
+      <form id="form-consulta" class="formulario">
+        <div class="rejilla">
+          <div class="campo">
+            <label for="codigo">Código del envío</label>
+            <input
+              id="codigo"
+              name="codigo"
+              type="text"
+              maxlength="12"
+              placeholder="Ej.: ENV-"
+            >
+          </div>
+
+          <div class="campo">
+            <label for="zona">Zona de destino</label>
+            <select id="zona" name="zona">
+              <option value="">Todas las zonas</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="estado">Estado del envío</label>
+            <select id="estado" name="estado">
+              <option value="">Todos los estados</option>
+              <option value="CREADO">Creado</option>
+              <option value="ACEPTADO">Aceptado</option>
+              <option value="ASIGNADO">Asignado</option>
+              <option value="RETIRADO">Retirado</option>
+              <option value="EN_RUTA">En ruta</option>
+              <option value="ENTREGADO">Entregado</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="destinatario">Nombre del destinatario</label>
+            <input
+              id="destinatario"
+              name="destinatario"
+              type="text"
+              maxlength="80"
+              placeholder="Buscar por nombre"
+            >
+          </div>
+
+          <div class="campo">
+            <label for="fecha_desde">Fecha desde</label>
+            <input
+              id="fecha_desde"
+              name="fecha_desde"
+              type="date"
+            >
+          </div>
+
+          <div class="campo">
+            <label for="fecha_hasta">Fecha hasta</label>
+            <input
+              id="fecha_hasta"
+              name="fecha_hasta"
+              type="date"
+            >
+          </div>
+        </div>
+
+        <div class="acciones">
+          <button class="boton" type="submit" id="buscar">
+            Buscar envíos
+          </button>
+          <button
+            class="boton boton--secundario"
+            type="button"
+            id="limpiar"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__titulo">Resultados de la consulta</h2>
+
+      <p id="resumen-consulta" aria-live="polite">
+        Cargando envíos...
+      </p>
+
+      <div class="tabla-contenedor">
+        <table class="tabla-repartidores">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Destinatario</th>
+              <th>Repartidor</th>
+              <th>Fecha de registro</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="resultados-consulta">
+            <tr>
+              <td colspan="8">Cargando resultados...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="acciones" aria-label="Paginación de resultados">
+        <button
+          type="button"
+          class="boton boton--secundario"
+          id="pagina-anterior"
+          disabled
+        >
+          Anterior
+        </button>
+
+        <span id="indicador-pagina">Página 1 de 1</span>
+
+        <button
+          type="button"
+          class="boton boton--secundario"
+          id="pagina-siguiente"
+          disabled
+        >
+          Siguiente
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Grupo 1 · ESPE</span>
+      <span>Dominio 5 · Consulta operativa</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/despacho/consulta.js"></script>
+</body>
+</html>

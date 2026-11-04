@@ -1,6 +1,11 @@
-// Módulo consulta — responsable: Camila.
-// Provisional: responde 501 hasta que se implemente.
-// Para implementarlo, reemplaza este contenido por un Router propio de Express.
-const { moduloPendiente } = require('../../shared/moduloPendiente');
+'use strict';
 
-module.exports = moduloPendiente('consulta', 'Camila');
+const express = require('express');
+const controlador = require('./consulta.controller');
+
+const router = express.Router();
+
+// Consultar envíos con filtros opcionales.
+router.get('/', controlador.buscarEnvios);
+
+module.exports = router;
