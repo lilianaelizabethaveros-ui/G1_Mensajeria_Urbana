@@ -13,7 +13,7 @@ Cada cambio de esquema es un archivo SQL numerado en esta carpeta. Al arrancar, 
    | --- | --- |
    | 001–099 | Liliana y archivos compartidos |
    | 100–199 | Camila |
-   | 200–299 | Juan Fernando |
+   | 200–299 | Juan Fernando (dominios asumidos por Liliana, D38) |
 
 3. La tabla `schema_migrations(version, nombre, hash, aplicada_en)` registra lo aplicado.
    Los pendientes se aplican en orden numérico, cada uno en su propia transacción.
@@ -40,4 +40,4 @@ SELECT version, nombre, aplicada_en FROM schema_migrations ORDER BY version;
 | `002_envios.sql` — tabla `envios` e índices | Liliana | 5 (creada) |
 | `090_semilla_catalogos.sql` — 4 zonas y 3 tipos de servicio ficticios | Compartido | 4 (creada) |
 | `1NN_*.sql` — repartidores, asignaciones | Camila | posterior |
-| `2NN_*.sql` — referencias de evidencia, si hicieran falta | Juan Fernando | posterior |
+| `201_evidencia_envio.sql` — `envios.evidencia_id`, `entregado_en` y `CHECK envios_entrega_coherente` | Liliana (D38) | 10 (creada) |

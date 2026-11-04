@@ -1,0 +1,91 @@
+/* Pantallas de seguimiento, repartidor y detalle (Dominios 3, 4 y 6).
+   Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+   Usa los colores de /css/estilos.css; aquí solo hay estilos propios de estas pantallas. */
+
+.seg-rejilla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 18px; margin-top: 18px; align-items: start; }
+.seg-pila { display: grid; gap: 18px; }
+
+/* Cabecera del envío consultado */
+.seg-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.seg-codigo { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; font-size: 1.5rem; font-weight: 700; letter-spacing: .04em; color: var(--azul-900); }
+.seg-fuente { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
+.seg-fuente--pg { color: var(--pg); }
+.seg-fuente--mongo { color: var(--mongo); }
+.seg-fuente--redis { color: var(--redis); }
+
+/* Avisos del historial */
+.seg-aviso { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radio-sm);
+  font-size: .9rem; margin-bottom: 14px; border: 1px solid transparent; }
+.seg-aviso svg { width: 18px; height: 18px; flex: none; margin-top: 2px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.seg-aviso--ok { background: var(--ok-suave); color: var(--ok); border-color: #bfe8d0; }
+.seg-aviso--atrasado { background: var(--aviso-suave); color: var(--aviso); border-color: #f5d9a3; }
+.seg-aviso--error { background: var(--error-suave); color: var(--error); border-color: #f6c3c3; }
+
+/* Línea de tiempo */
+.linea-tiempo { list-style: none; margin: 0; padding: 0; position: relative; }
+.linea-tiempo::before { content: ""; position: absolute; left: 11px; top: 6px; bottom: 6px; width: 2px; background: var(--borde); }
+.linea-tiempo li { position: relative; padding: 0 0 18px 38px; }
+.linea-tiempo li:last-child { padding-bottom: 0; }
+.linea-tiempo__punto { position: absolute; left: 4px; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--superficie); border: 3px solid var(--juan); }
+.linea-tiempo li.ultimo .linea-tiempo__punto { background: var(--juan); box-shadow: 0 0 0 4px var(--juan-suave); }
+.linea-tiempo li[data-tipo="INCIDENCIA"] .linea-tiempo__punto { border-color: var(--aviso); }
+.linea-tiempo li[data-tipo="ENTREGADO"] .linea-tiempo__punto { border-color: var(--ok); }
+.linea-tiempo li[data-tipo="ENTREGADO"].ultimo .linea-tiempo__punto { background: var(--ok); box-shadow: 0 0 0 4px var(--ok-suave); }
+.linea-tiempo li[data-tipo="CANCELADO"] .linea-tiempo__punto { border-color: var(--error); }
+.linea-tiempo__fila { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.linea-tiempo__fecha { font-size: .82rem; color: var(--texto-suave); }
+.linea-tiempo__actor { font-size: .78rem; font-weight: 700; color: var(--azul-700); background: var(--azul-100); padding: 1px 8px; border-radius: 999px; }
+.linea-tiempo__detalle { font-size: .88rem; color: var(--texto-suave); margin-top: 3px; }
+.linea-tiempo__secuencia { font-size: .72rem; color: var(--texto-tenue); font-family: Consolas, ui-monospace, monospace; }
+
+/* Datos en lista */
+.seg-datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
+.seg-datos .dato--ancho { grid-column: 1 / -1; }
+
+/* Estado temporal (Redis) */
+.temporal { display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: center; }
+.plano { width: 120px; height: 120px; border-radius: var(--radio-sm); border: 1px solid var(--borde); background: #fbfcfe; }
+.plano line { stroke: var(--borde); stroke-width: 1; }
+.plano circle { fill: var(--redis); stroke: #fff; stroke-width: 2; }
+.temporal__vacio { color: var(--texto-tenue); font-style: italic; }
+.ttl { font-family: Consolas, ui-monospace, monospace; font-weight: 700; }
+.barra-ttl { height: 6px; border-radius: 999px; background: var(--borde); overflow: hidden; margin-top: 6px; }
+.barra-ttl span { display: block; height: 100%; background: var(--redis); transition: width 1s linear; }
+
+/* Vista del repartidor */
+.rep-selector { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.rep-selector .campo { flex: 1; min-width: 220px; }
+.rep-resumen { display: flex; gap: 18px; flex-wrap: wrap; font-size: .9rem; color: var(--texto-suave); margin-top: 10px; }
+.rep-resumen strong { color: var(--texto); }
+.tareas { display: grid; gap: 14px; }
+.tarea { border: 1px solid var(--borde); border-radius: var(--radio); padding: 16px; background: var(--superficie); }
+.tarea__cabecera { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.tarea__codigo { font-family: Consolas, ui-monospace, monospace; font-weight: 700; font-size: 1.05rem; }
+.tarea__ruta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: .9rem; }
+.tarea__ruta span { display: block; font-size: .74rem; font-weight: 700; text-transform: uppercase; color: var(--texto-tenue); letter-spacing: .05em; }
+.tarea__acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.tarea__form { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--borde); display: grid; gap: 12px; }
+.tarea__form .rejilla { gap: 12px; }
+.boton--pequeno { padding: 8px 14px; font-size: .88rem; }
+.clave-evidencia { font-family: Consolas, ui-monospace, monospace; font-size: .8rem; color: var(--texto-tenue); word-break: break-all; }
+.conexion-botones { display: flex; gap: 6px; flex-wrap: wrap; }
+.conexion-botones .boton[aria-pressed="true"] { outline: 3px solid var(--ambar); outline-offset: 1px; }
+
+/* Evidencia */
+.evidencia__foto { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px dashed var(--borde); border-radius: var(--radio-sm);
+  background: #fbfcfe; font-size: .88rem; word-break: break-all; }
+.evidencia__foto svg { width: 34px; height: 34px; flex: none; fill: none; stroke: var(--texto-tenue); stroke-width: 1.6; }
+
+/* Tabla de consistencia (detalle) */
+.consistencia { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.consistencia th, .consistencia td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--borde); }
+.consistencia th { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-tenue); }
+
+@media (max-width: 860px) {
+  .seg-rejilla { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .seg-datos, .tarea__ruta { grid-template-columns: 1fr; }
+  .temporal { grid-template-columns: 1fr; }
+}

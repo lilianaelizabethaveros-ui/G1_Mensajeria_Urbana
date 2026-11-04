@@ -22,7 +22,7 @@ garantiza con transacciones **locales**, identificadores idempotentes y reintent
 Todo cambio de estado de un envío hace, **en una sola transacción de PostgreSQL**:
 actualizar `envios.estado` + insertar la fila en `outbox`. Si algo falla, no se guarda ninguno de los dos.
 
-### Sincronizador (lo implementa Juan Fernando)
+### Sincronizador (`modules/seguimiento/seguimiento.sincronizador.js`)
 
 Cada pocos segundos, dentro de la API:
 
@@ -31,7 +31,9 @@ Cada pocos segundos, dentro de la API:
 3. Marca `procesado_en = now()`. Si MongoDB falla, suma `intentos`, guarda `ultimo_error` y reintenta en la siguiente vuelta.
 4. Si la API se cae entre los pasos 2 y 3, el evento se reenvía al volver; el `_id` repetido evita el duplicado.
 
-Mientras el sincronizador no exista, los eventos se acumulan como pendientes. Es lo esperado.
+Implementación (D44): corre dentro de la API cada 2 s; usa `upsert` con `$setOnInsert`, así un evento ya copiado no se
+duplica ni se modifica. Si MongoDB falla, espera 4, 8, 16… hasta 30 s entre intentos. Estado en
+`GET /api/seguimiento/sincronizador`.
 
 ### Verificación
 
@@ -52,7 +54,7 @@ Mientras el sincronizador no exista, los eventos se acumulan como pendientes. Es
 Si se pierde la colección `eventos`: `UPDATE outbox SET procesado_en = NULL;` y el sincronizador la
 repuebla. Por eso los eventos de la outbox no se borran.
 
-## 2. Entrega con evidencia (diseño; lo implementa Juan Fernando)
+## 2. Entrega con evidencia (`modules/evidencias`)
 
 Regla: **ningún envío queda ENTREGADO sin evidencia guardada**. Por eso la evidencia se escribe
 primero en MongoDB y después se confirma el estado en PostgreSQL.
@@ -62,7 +64,8 @@ primero en MongoDB y después se confirma el estado en PostgreSQL.
 3. Inserta la evidencia en MongoDB `evidencias` con `_id = clave_evidencia`. Si ya existe (reintento), continúa.
 4. En una transacción de PostgreSQL:
    `UPDATE envios SET estado='ENTREGADO', evidencia_id=$1 WHERE codigo=$2 AND estado='EN_TRANSITO'`,
-   inserta el evento en la outbox y libera la capacidad del repartidor.
+   inserta el evento en la outbox y libera la capacidad del repartidor (`asignaciones.liberada_en`, D45).
+   La restricción `envios_entrega_coherente` (D43) impide en la base un ENTREGADO sin evidencia.
 5. Si el `UPDATE` no afecta filas y el envío ya está ENTREGADO con esa misma evidencia → `200`
    (reintento idempotente). Con otra evidencia → `409`.
 
@@ -70,7 +73,7 @@ primero en MongoDB y después se confirma el estado en PostgreSQL.
 | --- | --- | --- | --- |
 | MongoDB caído en el paso 3 | Nada cambia | `503`, reintento seguro | Reintentar con la misma clave |
 | PostgreSQL falla en el paso 4 | Evidencia en Mongo sin confirmar; envío EN_TRANSITO | `503`, reintento seguro | El reintento salta el paso 3 y repite el 4 |
-| El usuario no reintenta | Evidencia huérfana | — | Reconciliación: evidencias no referenciadas por un envío ENTREGADO tras 10 min (propuesta P4) se listan para que el operador confirme o descarte |
+| El usuario no reintenta | Evidencia huérfana | — | Reconciliación: evidencias no referenciadas por un envío ENTREGADO tras 10 min (D41, `GET /api/evidencias/huerfanas`) se listan para que el operador confirme o descarte |
 | Doble clic o red lenta | Dos peticiones con la misma clave | `201` y `200` | Ninguna |
 
 La confirmación oficial está en PostgreSQL: una evidencia es prueba de entrega solo si
@@ -85,3 +88,17 @@ nunca sustituye a la evidencia.
 | Cambio de estado | Sí | Transición condicionada al estado actual |
 | Registrar evidencia | Sí | `clave_evidencia` como `_id` |
 | Sincronizar outbox | Sí | `_id` = id del evento |
+
+## 4. Estado temporal (Redis)
+
+Redis guarda solo la última ubicación simulada y la conexión del repartidor, con TTL de 90 s (D39) y sin
+persistencia en disco (D40). Si Redis cae, solo `/api/estado-temporal` responde `503`; el seguimiento muestra
+"Estado temporal no disponible" y todo lo demás sigue. Al volver, las claves están vacías y la web muestra
+"Sin dato vigente" hasta el próximo reporte. La ubicación nunca reemplaza a la evidencia (D46).
+
+| Fallo | Qué queda | Respuesta | Recuperación |
+| --- | --- | --- | --- |
+| Redis caído | Envíos, historial y evidencias intactos | `503` solo en estado temporal | Automática al volver Redis (reconexión cada 2 s) |
+| Redis reiniciado | Claves vacías | "Sin dato vigente" | El repartidor vuelve a reportar |
+| Repartidor deja de reportar | La clave expira a los 90 s | "Sin dato vigente" | Ninguna; es lo esperado |
+

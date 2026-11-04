@@ -39,28 +39,35 @@ test('Ruta /api inexistente: 404 con formato de error uniforme', async () => {
 });
 
 
-test('Dominio 2 de Camila implementado y módulos pendientes con 501', async () => {
-  // El Dominio 2 ya está implementado.
+
+test('Todos los módulos implementados: despacho, consulta, seguimiento, evidencias y estado temporal', async () => {
+  // Verificar el Dominio 2: despacho.
   const despacho = await pedir('/api/despacho/repartidores');
 
   assert.equal(despacho.status, 200);
   assert.equal(despacho.cuerpo.ok, true);
   assert.ok(Array.isArray(despacho.cuerpo.datos));
 
-  // Estos módulos todavía están pendientes.
-  for (const prefijo of [
-    'consulta',
-    'seguimiento',
-    'evidencias',
-    'estado-temporal'
-  ]) {
-    const { status, cuerpo } = await pedir(`/api/${prefijo}`);
+  // Verificar el Dominio 5: consulta operativa.
+  const consulta = await pedir('/api/consulta?limite=5');
 
-    assert.equal(status, 501, prefijo);
-    assert.equal(cuerpo.error.codigo, 'NO_IMPLEMENTADO');
+  assert.equal(consulta.status, 200);
+  assert.equal(consulta.cuerpo.ok, true);
+  assert.ok(Array.isArray(consulta.cuerpo.datos.resultados));
+  assert.equal(consulta.cuerpo.datos.paginacion.limite, 5);
+
+  // Dominios 3, 4 y 6 (antes pendientes con 501): ya responden.
+  for (const ruta of [
+    '/api/seguimiento/sincronizador',
+    '/api/evidencias/huerfanas',
+    '/api/estado-temporal/repartidores',
+  ]) {
+    const { status, cuerpo } = await pedir(ruta);
+
+    assert.equal(status, 200, ruta);
+    assert.equal(cuerpo.ok, true, ruta);
   }
 });
-
 
 test('JSON mal formado: 400 JSON_INVALIDO', async () => {
   const { status, cuerpo } = await pedir('/api/despacho', {

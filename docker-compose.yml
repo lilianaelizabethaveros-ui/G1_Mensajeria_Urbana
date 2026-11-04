@@ -54,10 +54,12 @@ services:
       start_period: 30s
 
   # Estado temporal de repartidores (claves con expiración)
+  # Sin persistencia en disco (decisión P6 → D40): Redis solo guarda datos efímeros, así que
+  # al reiniciarse arranca vacío y la web muestra "sin dato vigente". Nada duradero vive aquí.
   redis:
     image: redis:7.4-alpine
     restart: unless-stopped
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}"]
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}", "--save", "", "--appendonly", "no"]
     environment:
       # Permite que redis-cli (healthcheck) se autentique sin mostrar la clave.
       REDISCLI_AUTH: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD en .env}

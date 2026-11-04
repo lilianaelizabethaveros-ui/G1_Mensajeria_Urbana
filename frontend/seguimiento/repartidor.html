@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vista del repartidor · Mensajería Urbana</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a8a'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/seguimiento/seguimiento.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación principal">
+          <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/envios/solicitud.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg><span>Solicitar envío</span></a>
+          <a href="/seguimiento/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z M18 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z M8.5 6H15a3 3 0 010 6H9a3 3 0 000 6h6.5"/></svg><span>Seguimiento</span></a>
+          <a href="/seguimiento/repartidor.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20a3 3 0 100-6 3 3 0 000 6z M18 20a3 3 0 100-6 3 3 0 000 6z M6 17l4-8h4l4 8 M10 9L9 6H7"/></svg><span>Repartidor</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas"><a href="/">Inicio</a> / Vista del repartidor</p>
+      <h1>Vista del repartidor</h1>
+      <p>Elige un repartidor ficticio para ver sus tareas, registrar retiro, tránsito, incidencia o entrega con evidencia, y simular su ubicación temporal.</p>
+    </div>
+  </section>
+
+  <main class="contenedor cuerpo-pagina">
+    <section class="panel" aria-labelledby="t-repartidor">
+      <h2 class="panel__titulo" id="t-repartidor"><span class="panel__numero">1</span>Repartidor</h2>
+      <div class="rep-selector">
+        <div class="campo">
+          <label for="repartidor">Repartidor</label>
+          <select id="repartidor"><option value="">Cargando repartidores…</option></select>
+        </div>
+        <button id="recargar" type="button" class="boton boton--secundario">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg>Actualizar
+        </button>
+      </div>
+      <div id="resumen" class="rep-resumen"></div>
+    </section>
+
+    <div id="mensaje" class="oculto" role="alert"></div>
+
+    <div class="seg-rejilla">
+      <section class="panel" aria-labelledby="t-tareas">
+        <h2 class="panel__titulo" id="t-tareas"><span class="panel__numero">2</span>Tareas en curso</h2>
+        <div id="tareas" class="tareas"><p class="tenue">Elige un repartidor.</p></div>
+      </section>
+
+      <section class="panel" aria-labelledby="t-temporal">
+        <h2 class="panel__titulo" id="t-temporal"><span class="panel__numero">3</span>Estado temporal <span class="seg-fuente seg-fuente--redis" style="margin-left:auto">Redis · expira en 90 s</span></h2>
+        <div id="temporal"><p class="tenue">Elige un repartidor.</p></div>
+        <div class="formulario" style="margin-top:14px">
+          <div class="campo">
+            <span class="dato__nombre">Conexión</span>
+            <div class="conexion-botones" id="conexion">
+              <button type="button" class="boton boton--secundario boton--pequeno" data-estado="EN_LINEA" disabled>En línea</button>
+              <button type="button" class="boton boton--secundario boton--pequeno" data-estado="OCUPADO" disabled>Ocupado</button>
+              <button type="button" class="boton boton--secundario boton--pequeno" data-estado="EN_PAUSA" disabled>En pausa</button>
+            </div>
+          </div>
+          <div class="grupo-botones">
+            <button id="simular" type="button" class="boton boton--pequeno" disabled>Simular ubicación</button>
+            <button id="no-vigente" type="button" class="boton boton--secundario boton--pequeno" disabled>Marcar no vigente</button>
+          </div>
+          <p class="aviso-nota"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4M12 16h.01M12 21a9 9 0 100-18 9 9 0 000 18z"/></svg>
+            <span>La posición es un punto en un plano ficticio de 0 a 100, sin mapas reales. Es un dato efímero: no sirve como prueba de entrega.</span></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Empresa de mensajería urbana · Grupo 1 · ESPE</span>
+      <span>Dominios 3, 4 y 6 · Seguimiento, evidencias y estado temporal</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/seguimiento/repartidor.js"></script>
+</body>
+</html>

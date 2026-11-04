@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seguimiento · Mensajería Urbana</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a8a'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/seguimiento/seguimiento.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="/" aria-label="Mensajería Urbana, inicio">
+        <svg class="marca__logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M8 12l8-4 8 4v9l-8 4-8-4z M8 12l8 4 8-4 M16 16v9"/>
+        </svg>
+        <span>Mensajería <strong>Urbana</strong></span>
+      </a>
+      <div class="barra__derecha">
+        <nav class="navegacion" aria-label="Navegación principal">
+          <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Inicio</span></a>
+          <a href="/envios/solicitud.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z M4 7l8 4 8-4 M12 11v10"/></svg><span>Solicitar envío</span></a>
+          <a href="/seguimiento/" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z M18 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z M8.5 6H15a3 3 0 010 6H9a3 3 0 000 6h6.5"/></svg><span>Seguimiento</span></a>
+          <a href="/seguimiento/repartidor.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20a3 3 0 100-6 3 3 0 000 6z M18 20a3 3 0 100-6 3 3 0 000 6z M6 17l4-8h4l4 8 M10 9L9 6H7"/></svg><span>Repartidor</span></a>
+        </nav>
+        <span class="barra__etiqueta">Datos 100 % ficticios</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <p class="migas"><a href="/">Inicio</a> / Seguimiento</p>
+      <h1>Seguimiento de un envío</h1>
+      <p>Escribe el código para ver el estado vigente y la línea de tiempo: retiro, tránsito, incidencias y entrega, con quién hizo cada cambio.</p>
+    </div>
+  </section>
+
+  <main class="contenedor cuerpo-pagina">
+    <section class="panel" aria-labelledby="t-buscar">
+      <h2 class="panel__titulo" id="t-buscar"><span class="panel__numero"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5"/></svg></span>Buscar por código</h2>
+      <form id="buscar" class="busqueda" novalidate>
+        <label for="codigo" class="oculto">Código de envío</label>
+        <input id="codigo" name="codigo" autocomplete="off" spellcheck="false" maxlength="12" placeholder="ENV-XXXXXXXX" aria-describedby="ayuda-codigo">
+        <button type="submit" class="boton boton--grande">Consultar</button>
+      </form>
+      <p class="ayuda tenue" id="ayuda-codigo" style="margin-top:8px;font-size:.84rem">El estado vigente sale de PostgreSQL; el historial, de MongoDB. Si el historial va atrasado, la pantalla lo indica.</p>
+    </section>
+
+    <div id="mensaje" class="oculto" role="alert"></div>
+    <div id="resultado" aria-live="polite"></div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <span>Proyecto B · Empresa de mensajería urbana · Grupo 1 · ESPE</span>
+      <span>Dominios 3, 4 y 6 · Seguimiento, evidencias y estado temporal</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/seguimiento/consulta.js"></script>
+</body>
+</html>

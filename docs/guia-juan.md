@@ -1,5 +1,8 @@
 # Guía de Juan Fernando Jaramillo
 
+> **Nota (2026-11-04):** esta parte la implementó Liliana Averos (decisión D38 en la bitácora). La guía se conserva
+> como registro de lo que se pidió; el detalle de lo hecho está en la Fase 10 de la bitácora y en `docs/api.md`.
+
 **Dominios:** 3 · Seguimiento y eventos, 4 · Evidencias de entrega y 6 · Estado temporal.
 **Rama:** `feat/juan-seguimiento` · **Módulos:** `backend/src/modules/seguimiento/`, `evidencias/`, `estado-temporal/`
 · **Pantallas:** `frontend/seguimiento/` · **Migraciones:** `200`–`299` · **Gestores:** MongoDB y Redis

@@ -67,10 +67,10 @@ Comprueba API, PostgreSQL, MongoDB y Redis (límite de 2 s por gestor), sin expo
 | `/api/catalogos` | Zonas y tipos de servicio | Liliana | Implementado (Fase 5) |
 | `/api/envios` | Solicitudes y envíos | Liliana | Implementado (Fase 5) |
 | `/api/despacho` | Despacho y asignaciones | Camila | Implementado y probado (Dominio 2) |
-| `/api/consulta` | Consulta operativa | Camila | `501` pendiente |
-| `/api/seguimiento` | Seguimiento y eventos | Juan Fernando | `501` pendiente |
-| `/api/evidencias` | Evidencias de entrega | Juan Fernando | `501` pendiente |
-| `/api/estado-temporal` | Estado temporal | Juan Fernando | `501` pendiente |
+| `/api/consulta` | Consulta operativa | Camila | Implementado y probado (Dominio 5) |
+| `/api/seguimiento` | Seguimiento y eventos | Liliana (D38) | Implementado y probado (Dominio 3) |
+| `/api/evidencias` | Evidencias de entrega | Liliana (D38) | Implementado y probado (Dominio 4) |
+| `/api/estado-temporal` | Estado temporal | Liliana (D38) | Implementado y probado (Dominio 6) |
 
 ## Liliana — Catálogos y envíos
 
@@ -321,18 +321,224 @@ Las pruebas comprueban:
 Las pruebas generan información ficticia en la base
 de datos local y no eliminan automáticamente sus registros.
 
-### Integración pendiente con otros dominios
+### Integración con otros dominios
 
-Se debe coordinar con el responsable de seguimiento
-la liberación de capacidad al registrar una entrega.
+La entrega (`POST /api/evidencias`) y la cancelación tras una incidencia liberan la
+asignación (`asignaciones.liberada_en = now()`) en la misma transacción del cambio de
+estado (D45), así el repartidor recupera su cupo.
 
 La consulta operativa del Dominio 5 se documentará
 cuando sus endpoints y filtros estén implementados.
 
 ### Dominio 5 — Consulta operativa
 
-*Pendiente de implementación.*
 
-## Juan Fernando — Seguimiento, evidencias y estado temporal
+**Estado:** Implementado y probado.
 
-*Pendiente.*
+**Responsable:** Camila Perrazo.
+
+**Gestor:** PostgreSQL.
+
+**Endpoint:** `GET /api/consulta`
+
+**Pantalla:** `/despacho/consulta.html`
+
+### Filtros disponibles
+
+| Parámetro | Descripción |
+| --- | --- |
+| `codigo` | Código completo o parcial del envío. |
+| `zona` | Código de zona de destino. |
+| `estado` | Estado actual del envío. |
+| `destinatario` | Nombre completo o parcial del destinatario. |
+| `fecha_desde` | Fecha inicial del registro, incluida. |
+| `fecha_hasta` | Fecha final del registro, incluida. |
+| `pagina` | Número de página, desde 1. |
+| `limite` | Resultados por página, de 1 a 100. |
+
+Los filtros son opcionales y pueden combinarse.
+
+### Ejemplo de consulta
+
+`GET /api/consulta?zona=CENTRO&estado=ACEPTADO`
+
+La respuesta utiliza el formato común `{ ok, datos }`.
+
+Dentro de `datos` se incluyen:
+- `resultados`: lista de envíos encontrados.
+- `paginacion`: página actual, límite, total y total de páginas.
+
+### Validaciones
+
+- `200`: consulta realizada correctamente, incluso sin coincidencias.
+- `400 VALIDACION`: filtros, fechas o paginación inválidos.
+- `500 ERROR_INTERNO`: error inesperado del servidor.
+
+### Decisión P2 — Índices PostgreSQL
+
+Se eligieron índices sobre la tabla `envios` en lugar de una vista derivada.
+
+Migración: `102_indices_consulta.sql`.
+
+La consulta lee directamente el estado vigente desde PostgreSQL.
+No requiere mantener ni sincronizar una copia adicional de los datos.
+
+### Archivos implementados
+
+- `backend/src/modules/consulta/consulta.repository.js`
+- `backend/src/modules/consulta/consulta.service.js`
+- `backend/src/modules/consulta/consulta.controller.js`
+- `backend/src/modules/consulta/consulta.routes.js`
+- `database/postgres/migrations/102_indices_consulta.sql`
+- `frontend/despacho/consulta.html`
+- `frontend/despacho/consulta.js`
+- `tests/consulta.test.js`
+
+### Pruebas realizadas
+
+**Comando:** `node --test tests/consulta.test.js`
+
+**Resultado:** 18 pruebas aprobadas, 0 fallidas.
+
+Se verificaron búsquedas por código, zona, estado, destinatario,
+fechas, filtros combinados, validaciones y paginación.
+
+**Pruebas generales del proyecto:** 63 aprobadas, 0 fallidas.
+
+La interfaz también se comprobó en Chrome, obteniendo
+12 envíos con la combinación zona CENTRO y estado ACEPTADO.
+
+
+## Seguimiento, evidencias y estado temporal (Dominios 3, 4 y 6)
+
+Responsable: Liliana Averos (asumió la parte asignada a Juan Fernando Jaramillo, D38).
+Todas las respuestas usan el formato común `{ ok, datos }` / `{ ok: false, error }`.
+
+### Dominio 3 — Seguimiento (`/api/seguimiento`)
+
+| Método y ruta | Qué hace | Éxito | Errores |
+| --- | --- | --- | --- |
+| `GET /api/seguimiento/:codigo` | Estado vigente (PostgreSQL), línea de tiempo (MongoDB), evidencia y estado temporal del repartidor | `200` | `400` código mal formado · `404` no existe |
+| `POST /api/seguimiento/:codigo/eventos` | El repartidor registra RETIRADO, EN_TRANSITO, INCIDENCIA o CANCELADO (solo desde INCIDENCIA) | `201` cambio registrado · `200` ya estaba en ese estado (`cambiado: false`, sin evento) | `400` validación · `404` · `409 TRANSICION_INVALIDA` · `409 NO_ASIGNADO` · `409 REQUIERE_EVIDENCIA` (si se pide ENTREGADO) |
+| `GET /api/seguimiento/repartidores/:codigo/tareas` | Envíos en curso del repartidor con las acciones que puede hacer | `200` | `400` · `404` |
+| `GET /api/seguimiento/sincronizador` | Estado del sincronizador outbox → MongoDB (vueltas, copiados, último error) | `200` | — |
+
+Cuerpo de `POST /api/seguimiento/:codigo/eventos`:
+
+```json
+{
+  "repartidor": "REP-003",
+  "estado": "INCIDENCIA",
+  "motivo": "Calle cerrada por obras",
+  "observacion": "Se intenta por otra ruta",
+  "ubicacion_x": 41.3,
+  "ubicacion_y": 39.1
+}
+```
+
+| Campo | Regla |
+| --- | --- |
+| `repartidor` | Obligatorio, `REP-NNN`; debe ser el de la asignación activa |
+| `estado` | Obligatorio: `RETIRADO`, `EN_TRANSITO`, `INCIDENCIA`, `CANCELADO` |
+| `motivo` | Obligatorio para `INCIDENCIA` y `CANCELADO` (3–200) |
+| `observacion` | Opcional (máx. 300) |
+| `ubicacion_x`, `ubicacion_y` | Opcionales, juntos, de 0 a 100 (plano ficticio, D42). Se guardan en el evento y se copian a Redis |
+
+Respuesta de `GET /api/seguimiento/:codigo` (resumida):
+
+```json
+{
+  "ok": true,
+  "datos": {
+    "envio": { "codigo": "ENV-X64SKJHF", "estado": "ENTREGADO", "evidencia_id": "f03d4c3b-…", "fechas": { "entregado_en": "…" } },
+    "estado_vigente": { "estado": "ENTREGADO", "fuente": "PostgreSQL", "actualizado_en": "…" },
+    "repartidor": { "codigo": "REP-003", "nombre": "Maria Lopez", "activa": false, "liberada_en": "…" },
+    "historial": {
+      "disponible": true, "eventos_oficiales": 8, "pendientes_sincronizar": 0, "al_dia": true, "coherente": true,
+      "eventos": [ { "id": "…", "secuencia": 276, "tipo": "CREADO", "actor": "CLIENTE", "datos": {}, "ocurrido_en": "…" } ]
+    },
+    "evidencia": { "clave_evidencia": "f03d4c3b-…", "receptor": { "tipo": "FAMILIAR", "nombre": "…" }, "confirmada": true },
+    "estado_temporal": null
+  }
+}
+```
+
+- `historial.disponible: false` cuando MongoDB no responde: el estado vigente se sigue mostrando (no es `503`).
+- `historial.al_dia: false` cuando la outbox tiene eventos de ese envío sin copiar.
+- `historial.coherente`: con el historial al día, el último evento debe ser igual al estado vigente.
+- `estado_temporal` solo aparece mientras el envío está en ruta (ASIGNADO, RETIRADO, EN_TRANSITO, INCIDENCIA).
+- CANCELADO tras una incidencia guarda `cancelado_en` y `motivo_cancelacion` y libera el cupo del repartidor.
+
+### Dominio 4 — Evidencias (`/api/evidencias`)
+
+| Método y ruta | Qué hace | Éxito | Errores |
+| --- | --- | --- | --- |
+| `POST /api/evidencias` | Guarda la evidencia (MongoDB) y confirma ENTREGADO (PostgreSQL) | `201` entrega confirmada · `200` reintento con la misma clave (`creada: false`) | `400` · `404` · `409 TRANSICION_INVALIDA` (no está EN_TRANSITO) · `409 NO_ASIGNADO` · `409 YA_ENTREGADO` (otra evidencia) · `409 CLAVE_EN_USO` · `503` MongoDB o PostgreSQL caído: **reintento seguro con la misma clave** |
+| `GET /api/evidencias?codigo_envio=ENV-…` | Evidencias de un envío, con `confirmada` | `200` | `400` |
+| `GET /api/evidencias/:clave` | Una evidencia | `200` | `400` · `404` |
+| `GET /api/evidencias/huerfanas` | Evidencias de más de 10 min sin envío ENTREGADO que las referencie (D41) | `200` | — |
+
+Cuerpo de `POST /api/evidencias`:
+
+```json
+{
+  "clave_evidencia": "f03d4c3b-8673-41ec-8b91-d378ee7aaa80",
+  "codigo_envio": "ENV-X64SKJHF",
+  "repartidor": "REP-003",
+  "receptor_tipo": "FAMILIAR",
+  "receptor_nombre": "Marta Inventada",
+  "receptor_relacion": "Hermana del destinatario",
+  "receptor_documento": "DOC-0001",
+  "observacion": "Paquete en buen estado",
+  "foto_referencia": "SIM-FOTO-ENV-X64SKJHF-01",
+  "ubicacion_x": 42.3,
+  "ubicacion_y": 41.7
+}
+```
+
+| Campo | Regla |
+| --- | --- |
+| `clave_evidencia` | Obligatorio, UUID generado por el navegador al abrir el formulario y repetido en cada reintento |
+| `receptor_tipo` | `DESTINATARIO`, `FAMILIAR`, `VECINO`, `PORTERIA`, `OTRO` |
+| `receptor_relacion` | Obligatorio si quien recibe no es el destinatario (dato heterogéneo) |
+| `receptor_documento` | Opcional, ficticio, 4–20 letras, números o guiones |
+| `foto_referencia` | URL simulada (`https://…`) o referencia sin espacios (`SIM-…`). No se sube ninguna imagen |
+| `ubicacion_x`, `ubicacion_y` | Opcionales, de 0 a 100 |
+
+Documento en MongoDB `evidencias` (`_id` = clave; validador `$jsonSchema` con los campos comunes):
+
+```json
+{ "_id": "f03d4c3b-…", "codigo_envio": "ENV-X64SKJHF", "repartidor": "REP-003",
+  "receptor": { "tipo": "FAMILIAR", "nombre": "Marta Inventada", "relacion": "Hermana del destinatario" },
+  "observacion": "Paquete en buen estado", "foto": { "tipo": "REFERENCIA", "valor": "SIM-FOTO-…" },
+  "ubicacion": { "x": 42.3, "y": 41.7, "sistema": "PLANO_FICTICIO_0_100" }, "registrada_en": "ISODate(…)" }
+```
+
+### Dominio 6 — Estado temporal (`/api/estado-temporal`)
+
+| Método y ruta | Qué hace | Éxito | Errores |
+| --- | --- | --- | --- |
+| `GET /api/estado-temporal/repartidores` | Ubicación y conexión de todos los repartidores | `200` | `503` Redis caído |
+| `GET /api/estado-temporal/repartidores/:codigo` | Ubicación y conexión de uno | `200` | `400` · `404` · `503` |
+| `PUT /api/estado-temporal/repartidores/:codigo/ubicacion` | `{ "x": 12.3, "y": 45.6, "codigo_envio"?: "ENV-…" }` en el plano 0–100 | `200` | `400` · `404` · `503` |
+| `PUT /api/estado-temporal/repartidores/:codigo/conexion` | `{ "estado": "EN_LINEA" \| "OCUPADO" \| "EN_PAUSA" }` | `200` | `400` · `404` · `503` |
+| `PATCH /api/estado-temporal/repartidores/:codigo/no-vigente` | Marca el dato como no vigente (borra las claves) | `200` | `400` · `404` · `503` |
+
+Cada dato devuelve `vigente`, sus valores, `ttl_segundos` (lo que le queda), `ttl_maximo_segundos` (90) y `expira_en`.
+Si expiró o se borró: `{ "vigente": false, "mensaje": "Sin dato vigente" }`. Claves en Redis:
+`repartidor:REP-NNN:ubicacion` y `repartidor:REP-NNN:conexion`, escritas con `SET … EX 90`.
+
+### Eventos que escriben estos módulos en la outbox
+
+| Tipo | Actor | `datos` |
+| --- | --- | --- |
+| `RETIRADO`, `EN_TRANSITO` | `REP-NNN` | `estado_anterior`, `observacion?`, `ubicacion?` |
+| `INCIDENCIA` | `REP-NNN` | `estado_anterior`, `motivo`, `ubicacion?` |
+| `CANCELADO` (tras incidencia) | `REP-NNN` | `estado_anterior`, `motivo`, `capacidad_liberada` |
+| `ENTREGADO` | `REP-NNN` | `estado_anterior`, `evidencia_id`, `receptor_tipo`, `capacidad_liberada`, `ubicacion?` |
+
+### Pruebas
+
+`node --test tests/seguimiento.test.js`: 16 pruebas (secuencia válida con orden y autor, transiciones inválidas → `409`,
+otro repartidor → `409`, idempotencia, entrega con evidencia y capacidad liberada, reintento con la misma clave sin
+duplicar, evidencia heterogénea, huérfanas, TTL que disminuye y "sin dato vigente", la ubicación no es prueba de entrega).

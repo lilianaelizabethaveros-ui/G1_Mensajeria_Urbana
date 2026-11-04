@@ -7,10 +7,10 @@ Sistema web para registrar envíos, asignarlos a repartidores y seguir cada paqu
 **persistencia políglota**: PostgreSQL, MongoDB y Redis detrás de una API REST en Node.js + Express.
 Todos los datos son ficticios.
 
-> **Estado actual: Fase 5 — Dominio 1 (Solicitudes y envíos).** Compose levanta PostgreSQL, MongoDB, Redis y la API.
-> Están listos `GET /health`, el formato de errores, los contratos compartidos, las migraciones, la web de inicio y
-> el Dominio 1: formulario de solicitud, comprobante con código único y gestión de la solicitud (aceptar o cancelar).
-> Los módulos de Camila y Juan Fernando responden `501` hasta que los desarrollen.
+> **Estado actual: los seis dominios están implementados.** Compose levanta PostgreSQL, MongoDB, Redis y la API.
+> Dominio 1 (solicitudes), 2 (despacho), 5 (consulta operativa), 3 (seguimiento con sincronizador outbox → MongoDB),
+> 4 (evidencias de entrega) y 6 (estado temporal en Redis con TTL). Pendiente del grupo: informe técnico, diagramas,
+> registro de evidencias y guion de defensa.
 
 ## Pantallas disponibles
 
@@ -20,6 +20,12 @@ Todos los datos son ficticios.
 | Solicitar envío | <http://localhost:3000/envios/solicitud.html> | Liliana Averos |
 | Confirmación (comprobante) | `/envios/confirmacion.html?codigo=ENV-…` (se abre al registrar) | Liliana Averos |
 | Gestionar solicitud (aceptar / cancelar) | <http://localhost:3000/envios/consulta.html> | Liliana Averos |
+| Panel de despacho (pendientes y asignación) | <http://localhost:3000/despacho/index.html> | Camila Perrazo |
+| Consulta operativa (filtros) | <http://localhost:3000/despacho/consulta.html> | Camila Perrazo |
+| Panel administrativo (zonas, repartidores, capacidad) | <http://localhost:3000/despacho/admin.html> | Camila Perrazo |
+| Seguimiento por código (línea de tiempo) | <http://localhost:3000/seguimiento/> | Liliana Averos |
+| Vista del repartidor (estados, entrega con evidencia, ubicación) | <http://localhost:3000/seguimiento/repartidor.html> | Liliana Averos |
+| Detalle de envío (estado, historial, evidencia, consistencia) | `/seguimiento/detalle.html?codigo=ENV-…` | Liliana Averos |
 
 ## Arquitectura
 
@@ -41,7 +47,7 @@ El navegador nunca se conecta a las bases de datos. Detalle en [docs/arquitectur
 | --- | --- | --- |
 | Liliana Averos | Infraestructura compartida + Dominio 1 (solicitudes y envíos) | `modules/envios`, `modules/catalogos`, `frontend/envios` |
 | Camila Perrazo | Dominio 2 (despacho) y Dominio 5 (consulta operativa) | `modules/despacho`, `modules/consulta`, `frontend/despacho` |
-| Juan Fernando Jaramillo | Dominios 3 (seguimiento), 4 (evidencias) y 6 (estado temporal) | `modules/seguimiento`, `modules/evidencias`, `modules/estado-temporal`, `frontend/seguimiento` |
+| Liliana Averos (asignados al inicio a Juan Fernando Jaramillo, ver D38) | Dominios 3 (seguimiento), 4 (evidencias) y 6 (estado temporal) | `modules/seguimiento`, `modules/evidencias`, `modules/estado-temporal`, `frontend/seguimiento` |
 
 ## Requisitos previos (Windows)
 
@@ -96,6 +102,13 @@ node --test tests/api.test.js
 # Dominio 1: solicitudes y envíos (API en ejecución)
 node --test tests/envios.test.js
 
+# Dominios 2 y 5: despacho y consulta operativa
+node --test tests/despacho.test.js
+node --test tests/consulta.test.js
+
+# Dominios 3, 4 y 6: seguimiento, evidencias y estado temporal
+node --test tests/seguimiento.test.js
+
 # Todo junto
 node --test --test-concurrency=1 "tests/*.test.js"
 ```
@@ -103,7 +116,20 @@ node --test --test-concurrency=1 "tests/*.test.js"
 Ejecuta siempre todas las pruebas con `--test-concurrency=1` (un archivo a la vez): algunas cuentan los eventos
 de la outbox y, si otro archivo escribe eventos al mismo tiempo, la cuenta no cuadra.
 
-`tests/envios.test.js` crea algunos envíos ficticios con `[PRUEBA]` en la descripción; no borra datos.
+Las pruebas crean envíos y repartidores ficticios con `[PRUEBA]` en la descripción; no borran datos.
+
+### Demostraciones de fallo (defensa)
+
+| Prueba | Comandos | Qué se observa |
+| --- | --- | --- |
+| MongoDB caído (prueba 5) | `docker compose stop mongo`, crear y aceptar un envío, `docker compose start mongo` | PostgreSQL sigue; `outbox.pendientes` sube en la página de inicio y baja a 0 al volver MongoDB (hasta 30 s). La línea de tiempo queda completa y sin duplicados |
+| Redis reiniciado (prueba 4) | `docker compose restart redis` | La ubicación del repartidor pasa a "Sin dato vigente"; la entrega, la evidencia y el historial siguen |
+| Redis caído | `docker compose stop redis` | Solo `/api/estado-temporal` responde `503`; el resto funciona |
+| Persistencia | `docker compose down` y `docker compose up -d` (sin `-v`) | Envíos, entregas, evidencias e historial siguen ahí |
+| Transición inválida | Vista del repartidor o `node --test tests/seguimiento.test.js` | `409 TRANSICION_INVALIDA` y ningún evento nuevo |
+
+Comprobación por envío: en DBeaver `SELECT count(*) FROM outbox WHERE codigo_envio = 'ENV-…';` y en Compass
+`db.eventos.countDocuments({ codigo_envio: 'ENV-…' })` deben dar lo mismo. La pantalla de detalle muestra ambos.
 
 ### Servicios y puertos
 
@@ -134,6 +160,7 @@ El código de `backend/src` y `frontend/` se monta dentro del contenedor y la AP
 (`node --watch`). Si en tu equipo no se recarga, usa `docker compose restart api`.
 
 Los datos viven en los volúmenes `mensajeria_pg_data`, `mensajeria_mongo_data` y `mensajeria_redis_data`.
+Redis funciona sin persistencia (decisión D40): solo guarda datos efímeros y al reiniciarse arranca vacío.
 
 ## Documentación
 

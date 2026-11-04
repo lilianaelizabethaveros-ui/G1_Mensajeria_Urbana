@@ -1,5 +1,5 @@
 // Punto de entrada: aplica migraciones, abre las conexiones y arranca el servidor HTTP.
-let env, app, postgres, mongo, redis, migrar;
+let env, app, postgres, mongo, redis, migrar, sincronizador;
 try {
   env = require('./config/env');
   app = require('./app');
@@ -7,6 +7,7 @@ try {
   mongo = require('./db/mongo');
   redis = require('./db/redis');
   ({ migrar } = require('./db/migrar'));
+  sincronizador = require('./modules/seguimiento/seguimiento.sincronizador');
 } catch (error) {
   // Por ejemplo, una variable de entorno obligatoria que falta.
   console.error('[api] configuración inválida:', error.message);
@@ -46,6 +47,9 @@ async function iniciar() {
   redis.conectar()
     .catch((e) => console.error('[redis] no disponible al arrancar:', e.message));
 
+  // 3. Sincronizador outbox → MongoDB (Dominio 3). Si MongoDB no está, reintenta solo.
+  sincronizador.iniciar();
+
   const servidor = app.listen(env.puerto, () => {
     console.log(`[api] escuchando en el puerto ${env.puerto} (${env.nodeEnv})`);
   });
@@ -54,6 +58,7 @@ async function iniciar() {
   async function detener(senal) {
     console.log(`[api] ${senal} recibido, cerrando conexiones...`);
     servidor.close();
+    sincronizador.detener();
     await Promise.allSettled([postgres.cerrar(), mongo.cerrar(), redis.cerrar()]);
     process.exit(0);
   }

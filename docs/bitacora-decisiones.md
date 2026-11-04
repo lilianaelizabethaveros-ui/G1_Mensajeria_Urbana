@@ -46,8 +46,8 @@ Docker Desktop estaba cerrado. Se resolvió abriéndolo.
 | D12 | Puertos del equipo configurables en `.env` | Puertos fijos: chocan con servicios locales | Aprobada | 2026-11-03 |
 | D13 | Catálogos de zonas y tipos de servicio creados por Liliana; CRUD de Camila | Esperar a Camila: el formulario no podría validarse | Aprobada | 2026-11-03 |
 | D14 | Migraciones SQL numeradas por rangos, aplicadas por la API al arrancar | Scripts `init`: solo con volumen nuevo. Flyway: otra tecnología | Aprobada | 2026-11-03 |
-| D15 | Evidencia primero en MongoDB, luego ENTREGADO en PostgreSQL, con clave idempotente | Estado primero: ENTREGADO sin evidencia | Aprobada (diseño; implementa Juan) | 2026-11-03 |
-| D16 | Sincronizador idempotente (`_id` = id del evento), verificable en `/health` | Copia sin identificador: duplicados al reintentar | Aprobada (diseño; implementa Juan) | 2026-11-03 |
+| D15 | Evidencia primero en MongoDB, luego ENTREGADO en PostgreSQL, con clave idempotente | Estado primero: ENTREGADO sin evidencia | Aprobada (implementada en la Fase 10) | 2026-11-03 |
+| D16 | Sincronizador idempotente (`_id` = id del evento), verificable en `/health` | Copia sin identificador: duplicados al reintentar | Aprobada (implementada en la Fase 10) | 2026-11-03 |
 | D17 | Actualizar ramas con `git status` limpio + `git fetch origin` + `git merge origin/main` | `git pull` o `rebase`: menos visible / reescribe historia | Aprobada | 2026-11-03 |
 | D18 | Índices de MongoDB creados al arrancar con `createIndex` (idempotente) | Scripts init de Mongo: solo con volumen nuevo | Aprobada (derivada de D14) | 2026-11-03 |
 | D19 | Imágenes con versión fija: `postgres:17-alpine`, `mongo:8.0`, `redis:7.4-alpine` | `latest`: cada integrante podría bajar una versión distinta | Aprobada | 2026-11-03 |
@@ -70,16 +70,26 @@ Docker Desktop estaba cerrado. Se resolvió abriéndolo.
 | D36 | Pantalla "Gestionar solicitud" (`consulta.html`) dentro del Dominio 1 para buscar por código, aceptar y cancelar | Esperar al panel de Camila: no se podría demostrar el flujo CREADO → ACEPTADO → CANCELADO del Dominio 1 | Aprobada | 2026-11-03 |
 | D37 | Entrega estimada calculada al consultar (`creado_en` + horas del tipo de servicio), sin guardarla | Guardarla en una columna: se desincronizaría si cambia el catálogo; queda abierto si se prefiere congelarla | Aprobada | 2026-11-03 |
 
+| D38 | Liliana Averos asume los Dominios 3, 4 y 6 (seguimiento, evidencias y estado temporal), asignados al inicio a Juan Fernando Jaramillo, porque esa parte no se desarrolló. Los archivos dicen "Responsable: Liliana Averos" | Dejar los dominios sin implementar: el proyecto no cumpliría los tres gestores en uso ni los flujos 3–5 | Propuesta (Liliana); confirmar con el grupo | 2026-11-04 |
+| D39 | TTL de 90 s para `repartidor:REP-NNN:ubicacion` y `repartidor:REP-NNN:conexion`; al expirar la web muestra "Sin dato vigente". "Marcar no vigente" borra las claves antes de tiempo | 30 s: expira entre dos reportes normales. 5 min: muestra una posición demasiado vieja como si fuera actual | Decidida por Liliana | 2026-11-04 |
+| D40 | Redis sin persistencia en disco (`--save ""`, `--appendonly no`): al reiniciar arranca vacío (resuelve P6) | Dejar las instantáneas por defecto: tras `restart` la ubicación volvía con su TTL restante y la prueba 4 no distinguía lo efímero. AOF: más escritura para datos que se descartan | Decidida por Liliana | 2026-11-04 |
+| D41 | Evidencias huérfanas: guardadas en MongoDB hace más de 10 min y que ningún envío ENTREGADO referencia; se listan en `GET /api/evidencias/huerfanas` para revisión del operador, sin borrarlas (resuelve P4) | Borrarlas automáticamente: se perdería una evidencia si PostgreSQL tarda en volver | Decidida por Liliana | 2026-11-04 |
+| D42 | Ubicación simulada en un plano ficticio de 0 a 100 (`x`, `y`), sin latitud ni longitud | Coordenadas GPS: el enunciado exige coordenadas inventadas y una latitud real apunta a un lugar real | Decidida por Liliana | 2026-11-04 |
+| D43 | `CHECK envios_entrega_coherente`: `ENTREGADO` ⇔ `evidencia_id` y `entregado_en` no nulos (migración `201`) | Controlarlo solo en la API: un `UPDATE` manual dejaría un ENTREGADO sin evidencia | Decidida por Liliana | 2026-11-04 |
+| D44 | Sincronizador dentro de la API: lotes de 50 `FOR UPDATE SKIP LOCKED`, `upsert` con `$setOnInsert` por `_id`, cada 2 s y espera creciente hasta 30 s si MongoDB falla | Proceso o contenedor aparte: otra pieza que levantar; cola de mensajes: tecnología nueva | Decidida por Liliana | 2026-11-04 |
+| D45 | La entrega y la cancelación tras una incidencia liberan la asignación (`asignaciones.liberada_en`) en la misma transacción, así el repartidor recupera su cupo | Esperar a que el operador libere a mano: el repartidor quedaría lleno con envíos ya terminados | Decidida por Liliana | 2026-11-04 |
+| D46 | La entrega (`ENTREGADO`) solo se registra con evidencia (`POST /api/evidencias`); el endpoint de cambios del repartidor la rechaza con `409 REQUIERE_EVIDENCIA` | Permitir ENTREGADO como cualquier cambio: habría entregas sin prueba | Decidida por Liliana | 2026-11-04 |
+
 ## Propuestas pendientes de acuerdo
 
 | N.º | Tema | Quién decide |
 | --- | --- | --- |
 | P1 | Transiciones concretas de la máquina de estados (`docs/source-of-truth.md`) | Equipo |
-| P2 | ¿La consulta operativa necesita vista derivada o bastan índices PostgreSQL? | Camila |
+| P2 | ¿La consulta operativa necesita vista derivada o bastan índices PostgreSQL? | Resuelta por Camila: índices en PostgreSQL (Fase 9) |
 | P3 | ¿Quién puede cancelar un envío ASIGNADO? | Equipo |
-| P4 | Plazo de 10 min para reconciliar evidencias huérfanas | Juan Fernando |
+| P4 | Plazo de 10 min para reconciliar evidencias huérfanas | Resuelta con D41 |
 | P5 | Idempotencia al crear envíos (clave de idempotencia) | Resuelta con D32 (aprobada) |
-| P6 | Persistencia de Redis (instantáneas por defecto, AOF o ninguna) según cómo se quiera demostrar la prueba 4 | Juan Fernando |
+| P6 | Persistencia de Redis (instantáneas por defecto, AOF o ninguna) según cómo se quiera demostrar la prueba 4 | Resuelta con D40 |
 
 ## Fase 2 — Estructura inicial (2026-11-03)
 
@@ -345,4 +355,112 @@ para los filtros de consulta.
 **Estado del Dominio 2:** implementado y probado;
 integración final con seguimiento pendiente de coordinación.
 
+
+## Fase 9 — Dominio 5: consulta operativa (2026-11-03)
+
+**Responsable:** Camila Perrazo.
+
+**Rama de trabajo:** `feat/camila-despacho`.
+
+### Implementación realizada
+
+- Módulo de consulta en `backend/src/modules/consulta/`.
+- Endpoint `GET /api/consulta`.
+- Pantalla `frontend/despacho/consulta.html`.
+- Lógica de búsqueda y paginación en `frontend/despacho/consulta.js`.
+- Migración `102_indices_consulta.sql`.
+- Pruebas automatizadas en `tests/consulta.test.js`.
+- Documentación actualizada en `docs/api.md`.
+
+### Funcionalidades verificadas
+
+| Funcionalidad | Resultado |
+| --- | --- |
+| Consultar envíos registrados | Correcto |
+| Buscar por código completo o parcial | Correcto |
+| Filtrar por zona de destino | Correcto |
+| Filtrar por estado | Correcto |
+| Buscar por destinatario | Correcto |
+| Filtrar por rango de fechas | Correcto |
+| Combinar varios filtros | Correcto |
+| Consultar sin coincidencias | Lista vacía |
+| Rechazar filtros inválidos | HTTP 400 |
+| Paginar los resultados | Correcto |
+| Consultar desde la interfaz web | Correcto |
+
+### Decisión P2 — Índices PostgreSQL
+
+**Decisión de implementación de Camila:** utilizar índices sobre PostgreSQL en lugar de una vista derivada.
+
+**Justificación:** la consulta operativa obtiene directamente los datos oficiales de `envios`, evitando duplicar información y mantener mecanismos adicionales de sincronización.
+
+**Migración:** `102_indices_consulta.sql`.
+
+No se requiere demostrar sincronización con una vista derivada porque no se creó una copia de los datos.
+
+La decisión queda documentada para conocimiento del equipo.
+
+### Pruebas realizadas
+
+Comando del Dominio 5:
+
+`node --test tests/consulta.test.js`
+
+Resultado:
+- 18 pruebas aprobadas.
+- 0 pruebas fallidas.
+
+Pruebas generales:
+
+`node --test --test-concurrency=1 tests/api.test.js tests/contratos.test.js tests/envios.test.js tests/despacho.test.js tests/consulta.test.js`
+
+Resultado:
+- 63 pruebas aprobadas.
+- 0 pruebas fallidas.
+
+### Verificación visual
+
+La interfaz se comprobó en Chrome.
+
+Se aplicaron simultáneamente los filtros:
+- Zona de destino: CENTRO.
+- Estado: ACEPTADO.
+
+Resultado observado: 12 envíos que cumplen ambos criterios.
+
+### Integración con el proyecto
+
+Se actualizó `tests/api.test.js` para comprobar que los Dominios 2 y 5 ya están implementados.
+
+No se modificaron los módulos de Liliana ni de Juan Fernando.
+
+**Estado del Dominio 5:** implementado y probado.
+
+## Fase 10 — Dominios 3, 4 y 6: seguimiento, evidencias y estado temporal (2026-11-04)
+
+**Responsable:** Liliana Averos (asumió la parte asignada a Juan Fernando Jaramillo, D38).
+
+### Implementación realizada
+
+- `backend/src/modules/seguimiento/`: línea de tiempo, cambios del repartidor y sincronizador outbox → MongoDB (`seguimiento.sincronizador.js`). `server.js` lo arranca y lo detiene.
+- `backend/src/modules/evidencias/`: entrega con evidencia (MongoDB primero, PostgreSQL después) y evidencias huérfanas.
+- `backend/src/modules/estado-temporal/`: ubicación y conexión del repartidor en Redis con TTL de 90 s.
+- Migración `201_evidencia_envio.sql`: `envios.evidencia_id`, `envios.entregado_en` y `CHECK envios_entrega_coherente`.
+- `docker-compose.yml`: Redis sin persistencia (D40).
+- Pantallas `frontend/seguimiento/`: consulta por código (`index.html`), vista del repartidor (`repartidor.html`) y detalle del envío (`detalle.html`). Tarjetas activas en la página de inicio.
+- `tests/seguimiento.test.js` (16 pruebas) y ajuste de `tests/api.test.js`, que antes esperaba `501` en estos módulos.
+
+### Pruebas (entorno de preparación, Docker con los mismos servicios)
+
+| Comprobación | Resultado |
+| --- | --- |
+| `node --test --test-concurrency=1 "tests/*.test.js"` | 79 de 79 correctas |
+| Flujo por la web: retiro → tránsito → incidencia → tránsito → entrega con evidencia (familiar) | 8 eventos en la outbox y 8 en MongoDB, último evento = estado vigente |
+| `docker compose stop mongo` + crear y aceptar un envío | PostgreSQL sigue; `outbox.pendientes` = 2 con `intentos` y `ultimo_error`; la línea de tiempo avisa que MongoDB no responde |
+| `docker compose start mongo` | Pendientes a 0; 2 eventos en la outbox y 2 en MongoDB, sin duplicados |
+| `docker compose stop redis` | Solo `/api/estado-temporal` responde `503`; envíos y seguimiento responden `200` |
+| `docker compose start redis` | La ubicación pasa a "Sin dato vigente"; `DBSIZE` = 0 |
+| `docker compose down` y `up -d` (sin `-v`) | El envío sigue ENTREGADO con su evidencia y sus 8 eventos |
+
+**Pendiente:** repetir estas comprobaciones en el PC de Liliana y guardar capturas para el registro de evidencias.
 
