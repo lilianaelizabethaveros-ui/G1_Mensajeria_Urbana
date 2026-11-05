@@ -1,5 +1,5 @@
 // Consultas del Dominio 6 (estado temporal del repartidor) en Redis.
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos
 //
 // Convención de claves (database/redis/README.md):
 //   repartidor:REP-001:ubicacion  → JSON { x, y, codigo_envio, registrada_en }   TTL 90 s

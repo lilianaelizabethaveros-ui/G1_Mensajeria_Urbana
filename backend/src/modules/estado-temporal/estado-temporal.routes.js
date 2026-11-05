@@ -1,5 +1,5 @@
 // Módulo estado-temporal — Dominio 6 (última ubicación simulada y conexión del repartidor).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 const { Router } = require('express');
 const controlador = require('./estado-temporal.controller');
 

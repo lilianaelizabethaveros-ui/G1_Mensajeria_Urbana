@@ -1,5 +1,5 @@
 // HTTP del Dominio 6 (estado temporal del repartidor).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 const servicio = require('./estado-temporal.service');
 
 async function listar(req, res) {

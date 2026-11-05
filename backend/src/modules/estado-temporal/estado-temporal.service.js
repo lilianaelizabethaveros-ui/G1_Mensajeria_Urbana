@@ -1,5 +1,5 @@
 // Reglas del Dominio 6 (estado temporal del repartidor).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 //
 // - Si Redis está caído, SOLO este módulo responde 503: el resto de la API sigue igual.
 // - La ubicación usa un plano FICTICIO de 0 a 100 (x, y): nunca coordenadas reales.

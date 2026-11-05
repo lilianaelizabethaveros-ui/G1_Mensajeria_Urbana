@@ -1,6 +1,6 @@
 # Módulo `estado-temporal` — Estado temporal de repartidores
 
-- **Responsable:** Liliana Averos (asignado al inicio a Juan Fernando Jaramillo; ver D38 en la bitácora)
+- **Responsable:** Liliana Averos 
 - **Dominio del enunciado:** Dominio 6
 - **Prefijo de URL:** `/api/estado-temporal`
 - **Gestor principal:** Redis (claves con TTL de 90 s, sin persistencia en disco)
