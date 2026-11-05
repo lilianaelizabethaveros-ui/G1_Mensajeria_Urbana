@@ -1,5 +1,5 @@
 // Reglas del Dominio 4 (evidencias de entrega). Diseño en docs/consistencia.md §2.
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Juan Jaramillo
 //
 // Regla principal: NINGÚN envío queda ENTREGADO sin evidencia guardada. Por eso:
 //   1. Se comprueba en PostgreSQL que el envío esté EN_TRANSITO y asignado a ese repartidor.

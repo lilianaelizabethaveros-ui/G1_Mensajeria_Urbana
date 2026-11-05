@@ -1,6 +1,6 @@
 # Módulo `evidencias` — Evidencias de entrega
 
-- **Responsable:** Liliana Averos (asignado al inicio a Juan Fernando Jaramillo; ver D38 en la bitácora)
+- **Responsable:** Juan Jaramillo
 - **Dominio del enunciado:** Dominio 4
 - **Prefijo de URL:** `/api/evidencias`
 - **Gestor principal:** MongoDB (colección `evidencias`, con validador `$jsonSchema`)

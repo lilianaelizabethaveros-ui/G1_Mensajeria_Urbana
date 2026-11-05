@@ -1,5 +1,5 @@
 // Consultas del Dominio 4 (evidencias de entrega).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Juan Jaramillo
 //
 // MongoDB, colección "evidencias": un documento por prueba de entrega, con _id = clave_evidencia
 // (UUID que genera el navegador). Los datos son heterogéneos: según quién recibe cambian los

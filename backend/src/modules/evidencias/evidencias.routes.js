@@ -1,5 +1,5 @@
 // Módulo evidencias — Dominio 4 (evidencias de entrega).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Juan Jaramillo 
 // Express 5 envía automáticamente al errorHandler los errores de funciones async.
 const { Router } = require('express');
 const controlador = require('./evidencias.controller');
