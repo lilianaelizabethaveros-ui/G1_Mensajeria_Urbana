@@ -1,5 +1,5 @@
 // Reglas del Dominio 3 (seguimiento y eventos).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 //
 // - El estado VIGENTE siempre sale de PostgreSQL (envios.estado).
 // - El HISTORIAL sale de MongoDB "eventos", copiado desde la outbox por el sincronizador.

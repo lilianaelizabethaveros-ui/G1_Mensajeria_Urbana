@@ -1,5 +1,5 @@
 // HTTP del Dominio 3 (seguimiento y eventos).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos
 const servicio = require('./seguimiento.service');
 
 // GET /api/seguimiento/sincronizador

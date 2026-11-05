@@ -1,5 +1,5 @@
 // Sincronizador outbox (PostgreSQL) → eventos (MongoDB). Diseño en docs/consistencia.md §1.
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 //
 // Cada vuelta, dentro de UNA transacción de PostgreSQL:
 //   1. Toma hasta 50 eventos pendientes en orden (FOR UPDATE SKIP LOCKED: si hubiera dos

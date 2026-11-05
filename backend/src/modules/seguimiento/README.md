@@ -1,6 +1,6 @@
 # Módulo `seguimiento` — Seguimiento y eventos
 
-- **Responsable:** Liliana Averos (asignado al inicio a Juan Fernando Jaramillo; ver D38 en la bitácora)
+- **Responsable:** Liliana Averos 
 - **Dominio del enunciado:** Dominio 3
 - **Prefijo de URL:** `/api/seguimiento`
 - **Gestores:** MongoDB (colección `eventos`) para el historial; PostgreSQL para el estado vigente

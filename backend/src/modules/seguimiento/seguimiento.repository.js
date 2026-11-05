@@ -1,5 +1,5 @@
 // Consultas del Dominio 3 (seguimiento y eventos).
-// Responsable: Liliana Averos (asumió la parte de Juan Fernando, ver D38).
+// Responsable: Liliana Averos 
 //
 // - PostgreSQL: estado vigente del envío, asignación activa y outbox (fuente oficial).
 // - MongoDB, colección "eventos": copia ordenada e inmutable de la outbox para la línea de tiempo.
