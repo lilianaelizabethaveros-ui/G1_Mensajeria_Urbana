@@ -1,5 +1,5 @@
 // HTTP del Dominio 4 (evidencias de entrega): lee la petición y elige el código HTTP.
-// Responsable: Liliana Averos
+// Responsable: Juan Jaramillo
 const servicio = require('./evidencias.service');
 
 // POST /api/evidencias → 201 si se confirmó la entrega ahora; 200 si era un reintento ya confirmado.
